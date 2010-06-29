@@ -1,0 +1,7 @@
+Utils contain a collection of handy routines for iOS app development.
+
+UI_Categories has a set of UIKIT extensions to add functionality.
+
+GM_Subclasses are subclassed UI classes modified to make them easier to use or
+to help diagnose issues and find out how they work.
+
