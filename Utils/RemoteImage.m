@@ -122,7 +122,7 @@ NSString* const RemoteImageStatusChangedNotification = @"RemoteImageStatusChange
 			}
 			
 		} else {
-			// image/newImage are nil but status should be unloaded
+			// image & newImage are nil but status should be unloaded
 			if (imageURL) {
 				[self load];	// loads the image
 			} else {
@@ -133,7 +133,7 @@ NSString* const RemoteImageStatusChangedNotification = @"RemoteImageStatusChange
 }
 
 - (void)operateWithPriority:(NSOperationQueuePriority)priority {
-	NSLog(@"%s", __PRETTY_FUNCTION__);
+	///NSLog(@"%s", __PRETTY_FUNCTION__);
 
 	if (operation && [operation isCancelled]) {
 		[operation release];
@@ -164,7 +164,7 @@ NSString* const RemoteImageStatusChangedNotification = @"RemoteImageStatusChange
 			[context setObject:imageURL forKey:kURLKey]; // pass URL in as string
 		} else {
 			// have no URL and no image, nothing we can do here
-			NSLog(@"%s no image, no URL", __PRETTY_FUNCTION__);
+			NSLog(@"%s ERROR: no image, no URL", __PRETTY_FUNCTION__);
 			self.status = kRemoteImageFailedToLoad;
 			return;
 		}
@@ -174,7 +174,6 @@ NSString* const RemoteImageStatusChangedNotification = @"RemoteImageStatusChange
 												   selector:@selector(imageOperationDone:)
 													 target:self];
 	[operation setQueuePriority:priority];
-	NSLog(@"%s queuing op", __PRETTY_FUNCTION__);
 	[[RemoteImage queue] addOperation:operation];
 }
 

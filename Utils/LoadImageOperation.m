@@ -44,7 +44,7 @@
  	CGImageRef imageRef = origImage.CGImage;
 	CGPoint origin = CGPointMake(0,0);
 	
-	// normal or rotated image orientation?
+	// normal or 90 rotated image orientation?
 	BOOL normal = (origImage.imageOrientation == UIImageOrientationUp || 
 		           origImage.imageOrientation == UIImageOrientationDown); 
 	
