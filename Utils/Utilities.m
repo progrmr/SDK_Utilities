@@ -154,7 +154,9 @@
 {
 	NSDate* weekStartDate = [[[NSDate alloc] init] autorelease];
 	
+#ifndef NS_BLOCK_ASSERTIONS
 	[Utilities notImplementedYet:@"getStartOfWeek"];
+#endif
 	
 	return weekStartDate;
 }
