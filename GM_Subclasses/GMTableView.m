@@ -25,11 +25,7 @@
 		[activeCell resignFirstResponder];		// put away any keyboard or picker
 		
 		// set new path if newCell is non-nil
-		if (newCell) {
-			self.activePath = [self indexPathForCell:newCell];
-		} else {
-			self.activePath = nil;
-		}
+		self.activePath = newCell ? [self indexPathForCell:newCell] : nil;
 	}	
 
 	[activeCell release];
@@ -39,6 +35,9 @@
 - (void)willMoveToWindow:(UIWindow *)newWindow
 {
 	if (newWindow) {
+		//--------------------------------------
+		// Subscribe to Keyboard notifications
+		//--------------------------------------
 		[[NSNotificationCenter defaultCenter] addObserver: self 
 												 selector: @selector(keyboardWillShow:)
 													 name: UIKeyboardWillShowNotification 
@@ -66,11 +65,17 @@
 	keyboardHeight = 0;
 	
 	if (self.window == nil) {
+		//--------------------------------------
+		// Unsubscribe to Keyboard notifications
+		//--------------------------------------
 		[[NSNotificationCenter defaultCenter] removeObserver:self];	
 	}
 	[super didMoveToWindow];
 }
 
+//-------------------------------------------------------------
+// override hitTest:withEvent: to track which cell is "active"
+//-------------------------------------------------------------
 -(UIView*) hitTest:(CGPoint)point withEvent:(UIEvent*)event
 {
 	// check to see if the hit is in this table view
@@ -173,8 +178,8 @@
 }
 
 - (void)dealloc {
-	self.activeCell = nil;
-	self.activePath = nil;
+	[activeCell release];
+	[activePath release];
 	
     [super dealloc];
 }
