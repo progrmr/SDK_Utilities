@@ -186,7 +186,9 @@ CGRect computeNewFrame(CGSize  targetFrameSize,
 //-----------------------------------------------------------------------------
 CGFloat distanceBetweenPoints(CGPoint pt1, CGPoint pt2)
 {
-    return sqrt(pow(pt1.x-pt2.x, 2) + pow(pt1.y-pt2.y, 2));
+    CGFloat dx = pt2.x - pt1.x;
+    CGFloat dy = pt2.y - pt1.y;
+    return sqrt(dx*dx + dy*dy);
 }
 
 //-----------------------------------------------------------------------------
