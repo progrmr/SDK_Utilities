@@ -114,10 +114,6 @@
 											 selector:@selector(saveDataToFile:) 
 												 name:UIApplicationWillTerminateNotification 
 											   object:app];
-///	[[NSNotificationCenter defaultCenter] addObserver:self 
-///											 selector:@selector(saveDataToFile:) 
-///												 name:UIApplicationDidReceiveMemoryWarningNotification 
-///											   object:app];
 	[[NSNotificationCenter defaultCenter] addObserver:self 
 											 selector:@selector(saveDataToFile:) 
 												 name:UIApplicationWillResignActiveNotification 
