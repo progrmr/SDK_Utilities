@@ -430,6 +430,20 @@ BOOL isFileInDocuments(NSURL* fileURL)
 	return result;
 }
 
+//----------------------------------------------------------------------
+// logs the event to the FlurryAPI 
+// (or to NSLog if in development)
+//----------------------------------------------------------------------
+void logEvent(NSString* description) 
+{
+#ifndef DEBUG
+	// count/log events using the FlurryAPI
+	[FlurryAPI logEvent:description];
+#else
+	///NSLog(@"FLURRY: %@", description);
+#endif		
+}
+
 @end
 
 
