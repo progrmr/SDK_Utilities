@@ -168,5 +168,11 @@ void listFiles(NSString* directory);
 //----------------------------------------------------------------------
 BOOL isFileInDocuments(NSURL* fileURL);
 
+//----------------------------------------------------------------------
+// logs the event to the FlurryAPI 
+// (or to NSLog if in development)
+//----------------------------------------------------------------------
+void logEvent(NSString* description); 
+
 @end
 
