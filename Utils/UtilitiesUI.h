@@ -6,10 +6,25 @@
 //  Copyright 2010 Gary A. Morris. All rights reserved.
 //
 #import <UIKit/UIKit.h>
+#import <QuartzCore/QuartzCore.h>
 
 @interface UtilitiesUI {
 	
 }
+
+//-----------------------------------------------------------------------------
+// addConvexHighlightToLayer - creates a new layer and adds it to the given layer
+//		this highlight brightens the top half, darkens the bottom half to
+//      simulate a raised (convex) surface with lighting from above
+//-----------------------------------------------------------------------------
+CAGradientLayer* addConvexHighlightToLayer(CALayer* layer);
+
+//-----------------------------------------------------------------------------
+// addConcaveHighlightToLayer - creates a new layer and adds it to the given layer
+//		this highlight brightens the bottom half, darkens the top half to
+//      simulate a detent (concave) surface with lighting from above
+//-----------------------------------------------------------------------------
+CAGradientLayer* addConcaveHighlightToLayer(CALayer* layer);
 
 //-----------------------------------------------------------------------------
 // BOOL isPad()
