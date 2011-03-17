@@ -67,6 +67,8 @@ void destCoordsInDegrees(double lat1, double lon1,
 
 // Normalize a heading in degrees to be within -179.999999° to 180.00000°
 double normalize180(double heading);
+float normalize180f(float heading);
 
 // Normalize a heading in degrees to be within 0° to 359.999999°
 double normalize360(double heading);
+float normalize360f(float heading);
