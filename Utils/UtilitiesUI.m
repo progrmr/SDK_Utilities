@@ -13,6 +13,81 @@
 @implementation UtilitiesUI
 
 //-----------------------------------------------------------------------------
+// addConvexHighlightToLayer - creates a new layer and adds it to the given layer
+//		this highlight brightens the top half, darkens the bottom half to
+//      simulate a raised (convex) surface with lighting from above
+//-----------------------------------------------------------------------------
+CAGradientLayer* addConvexHighlightToLayer(CALayer* toLayer)
+{
+    CAGradientLayer*shineLayer = [CAGradientLayer layer];
+	
+    shineLayer.frame = toLayer.bounds;
+    shineLayer.colors = [NSArray arrayWithObjects:
+                         (id)[UIColor colorWithWhite:1.0f  alpha:0.25f].CGColor, //orig white=1 a=0.4
+                         (id)[UIColor colorWithWhite:1.0f  alpha:0.08f].CGColor, //orig white=1 a=0.2
+                         (id)[UIColor colorWithWhite:0.75f alpha:0.15f].CGColor,//orig white=0.75 a=0.2
+                         (id)[UIColor colorWithWhite:0.4f  alpha:0.15f].CGColor, //orig white=0.4 a=0.2
+                         (id)[UIColor colorWithWhite:1.0f  alpha:0.25f].CGColor, //orig white=1 a=0.4
+                         nil];
+    shineLayer.locations = [NSArray arrayWithObjects:
+                            [NSNumber numberWithFloat:0.0f],	// 1st gradient starts here
+                            [NSNumber numberWithFloat:0.5f],	// 1st gradient end, 2nd starts
+                            [NSNumber numberWithFloat:0.5f],	// 2nd grad ends, 3rd starts
+                            [NSNumber numberWithFloat:0.8f],	// 3rd grad ends, 4th start
+                            [NSNumber numberWithFloat:1.0f],	// end of gradient
+                            nil];
+	
+	[toLayer addSublayer:shineLayer];
+	
+	return [[shineLayer retain] autorelease];		// also return a ref to the new layer
+}
+
+//-----------------------------------------------------------------------------
+// addConcaveHighlightToLayer - creates a new layer and adds it to the given layer
+//		this highlight brightens the bottom half, darkens the top half to
+//      simulate a detent (concave) surface with lighting from above
+//-----------------------------------------------------------------------------
+CAGradientLayer* addConcaveHighlightToLayer(CALayer* toLayer)
+{
+    CAGradientLayer*shineLayer = [CAGradientLayer layer];
+	
+    shineLayer.frame = toLayer.bounds;
+    shineLayer.colors = [NSArray arrayWithObjects:
+						 (id)[UIColor colorWithWhite:0.3f  alpha:0.40f].CGColor, //orig white=1 a=0.4
+                         (id)[UIColor colorWithWhite:0.4f  alpha:0.30f].CGColor, //orig white=0.4 a=0.2
+                         (id)[UIColor colorWithWhite:0.5f  alpha:0.15f].CGColor, //orig white=0.75 a=0.2
+                         (id)[UIColor colorWithWhite:1.0f  alpha:0.10f].CGColor, //orig white=1 a=0.2
+						 (id)[UIColor colorWithWhite:1.0f  alpha:0.25f].CGColor, //orig white=1 a=0.4
+                         nil];
+    shineLayer.locations = [NSArray arrayWithObjects:
+                            [NSNumber numberWithFloat:0.0f],	// 1st gradient starts here
+                            [NSNumber numberWithFloat:0.1f],	// 1st gradient end, 2nd starts
+                            [NSNumber numberWithFloat:0.5f],	// 2nd grad ends, 3rd starts
+                            [NSNumber numberWithFloat:0.9f],	// 3rd grad ends, 4th start
+                            [NSNumber numberWithFloat:1.0f],	// end of gradient
+                            nil];
+	
+	[toLayer addSublayer:shineLayer];
+	
+	return [[shineLayer retain] autorelease];		// also return a ref to the new layer
+}
+
+//-----------------------------------------------------------------------------
+// addHighlightLayer - creates a new highlighting layer and adds it toLayer
+//-----------------------------------------------------------------------------
+CALayer* addHighlightLayer(CALayer* toLayer)
+{
+	CALayer* highlightLayer = [CALayer layer];
+
+	highlightLayer.frame = toLayer.bounds;
+	highlightLayer.backgroundColor = [UIColor colorWithRed:0.25f green:0.25f blue:0.25f alpha:0.75].CGColor;
+
+	[toLayer addSublayer:highlightLayer];
+	
+	return [[highlightLayer retain] autorelease];
+}
+
+//-----------------------------------------------------------------------------
 // BOOL isPad()
 //-----------------------------------------------------------------------------
 BOOL isPad() {
