@@ -116,6 +116,20 @@ double normalize180(double heading)
 	}
 }
 
+// Normalize a heading in degrees to be within -179.999999° to 180.00000°
+float normalize180f(float heading)
+{
+	while (1) {
+		if (heading <= -180) {
+			heading += 360;
+		} else if (heading > 180) {
+			heading -= 360;
+		} else {
+			return heading;
+		}
+	}
+}
+
 // Normalize a heading in degrees to be within 0° to 359.999999°
 double normalize360(double heading)
 {
@@ -129,3 +143,18 @@ double normalize360(double heading)
 		}
 	}
 }
+
+// Normalize a heading in degrees to be within 0° to 359.999999°
+float normalize360f(float heading)
+{
+	while (1) {
+		if (heading < 0) {
+			heading += 360;
+		} else if (heading >= 360) {
+			heading -= 360;
+		} else {
+			return heading;
+		}
+	}
+}
+
