@@ -10,6 +10,7 @@
 #include "Utilities.h"
 #import <UIKit/UIKit.h>
 #import "mach/mach.h"
+#import "FlurryAPI.h"
 
 @implementation Utilities
 
