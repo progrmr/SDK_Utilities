@@ -14,20 +14,6 @@
 @synthesize fullPathname;
 
 //----------------------------------------------------------------
-// dealloc
-//----------------------------------------------------------------
--(void)dealloc
-{
-	// remove self as observer before we get deallocated
-	[[NSNotificationCenter defaultCenter] removeObserver:self];
-	
-	[stateData	  release];
-	[fullPathname release];
-
-	[super dealloc];
-}
-
-//----------------------------------------------------------------
 // init state data - reads from StateData.xml, file need not exist
 //----------------------------------------------------------------
 -(id)init
@@ -68,6 +54,23 @@
 		NSLog(@"%s wrote %d to %@", __PRETTY_FUNCTION__, [stateData count], fullPathname);
 		///NSLog(@"%@", stateData);
 	}
+}
+
+//----------------------------------------------------------------
+// dealloc
+//----------------------------------------------------------------
+-(void)dealloc
+{
+	// remove self as observer before we get deallocated
+	[[NSNotificationCenter defaultCenter] removeObserver:self];
+	
+    // save data before discarding it
+    [self saveDataToFile:nil];
+    
+	[stateData	  release];
+	[fullPathname release];
+    
+	[super dealloc];
 }
 
 //----------------------------------------------------------------
