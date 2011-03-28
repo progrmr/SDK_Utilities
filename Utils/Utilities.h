@@ -169,10 +169,22 @@ void listFiles(NSString* directory);
 BOOL isFileInDocuments(NSURL* fileURL);
 
 //----------------------------------------------------------------------
-// logs the event to the FlurryAPI 
-// (or to NSLog if in development)
+// logs the event to the FlurryAPI or 
+// logs to NSLog (if FLURRYAPI is not defined)
 //----------------------------------------------------------------------
 void logEvent(NSString* description); 
+
+//----------------------------------------------------------------------------
+// fourBitsFromHexChar
+//    input: '0'..'9','A'..'F' (or 'a'..'f')
+//    output: 0..15
+//----------------------------------------------------------------------------
+uint8_t fourBitsFromHexChar(char hexChar);
+
+//----------------------------------------------------------------------------
+// charFromFourBits - input: 0..15, output: '0'..'9','A'..'F'
+//----------------------------------------------------------------------------
+char charFromFourBits(uint8_t fourBits);
 
 @end
 

@@ -10,7 +10,10 @@
 #include "Utilities.h"
 #import <UIKit/UIKit.h>
 #import "mach/mach.h"
+
+#ifdef FLURRYAPI
 #import "FlurryAPI.h"
+#endif
 
 @implementation Utilities
 
@@ -437,12 +440,37 @@ BOOL isFileInDocuments(NSURL* fileURL)
 //----------------------------------------------------------------------
 void logEvent(NSString* description) 
 {
-#ifndef DEBUG
+#ifdef FLURRYAPI
 	// count/log events using the FlurryAPI
 	[FlurryAPI logEvent:description];
 #else
-	///NSLog(@"FLURRY: %@", description);
+	NSLog(@"logEvent: %@", description);
 #endif		
+}
+
+//----------------------------------------------------------------------------
+// fourBitsFromHexChar
+//    input: '0'..'9','A'..'F' (or 'a'..'f')
+//    output: 0..15
+//----------------------------------------------------------------------------
+uint8_t fourBitsFromHexChar(char hexChar) {
+    if (hexChar >= 'A' && hexChar <= 'F') {
+        return hexChar - 'A' + 10;
+    } else if (hexChar >= 'a' && hexChar <= 'f') {
+        return hexChar - 'a' + 10;
+    }
+    return (hexChar - '0') & 0xF;   // assume isdigit
+}
+
+//----------------------------------------------------------------------------
+// charFromFourBits - input: 0..15, output: '0'..'9','A'..'F'
+//----------------------------------------------------------------------------
+char charFromFourBits(uint8_t fourBits) {
+    if (fourBits <= 9) {
+        return '0' + fourBits;
+    } else {
+        return 'A' + (fourBits - 10);
+    }
 }
 
 @end
