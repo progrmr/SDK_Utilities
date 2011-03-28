@@ -117,7 +117,6 @@ UINavigationController* navController();
 
 void setNavController(UINavigationController* newNavController);
 
-#define DEBUG 1
 #if DEBUG
 //-----------------------------------------------------------------------------
 // dumpWindows - prints the windows and their subview hierarchy in console log
