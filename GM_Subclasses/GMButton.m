@@ -3,20 +3,24 @@
 //  NextSprinter
 //
 //  Created by Gary Morris on 3/12/11.
-//  Copyright 2011 __MyCompanyName__. All rights reserved.
+//  Copyright 2011 Gary A. Morris. All rights reserved.
 //
 
 #import "GMButton.h"
-
+#import "Utilities.h"
 
 @implementation GMButton
 
 #define kBevelInset (0.75f)   /* in pixels */
+#define kSpinnerInset (2)     /* in pixels */
+#define kFontSize (14)
 
 - (void)dealloc {
 	[bevelLayer release];
 	[colorLayer release];
-	[glossLayer release];	
+	[glossLayer release];
+	[spinnerView release];
+    
     [super dealloc];
 }
 
@@ -45,7 +49,7 @@
 		[self setTitleShadowColor:[UIColor colorWithWhite:0.2f alpha:0.8f] 
 						 forState:UIControlStateNormal];  // alpha<1 to pick up bg color
 		self.titleLabel.shadowOffset = CGSizeMake(0, -kBevelInset);
-		self.titleLabel.font = [UIFont boldSystemFontOfSize:12];
+		self.titleLabel.font = [UIFont boldSystemFontOfSize:kFontSize];
 	}
 	
 	//---------------------------
@@ -149,24 +153,6 @@ StateType stateFromUIControlState(UIControlState aState)
 	[self updateColorLayerForCurrentState];
 }
 
-#if 0
-//----------------------------------------------------------------------------
-// Override setBackgroundColor and backgroundColor because the original 
-// background color is covered up and replaced by the colorLayer.  
-//----------------------------------------------------------------------------
--(void)setBackgroundColor:(UIColor *)newColor
-{
-	// set the color for the current state.
-	[self setColor:newColor forState:self.state];
-}
-
--(UIColor*)backgroundColor
-{
-	// return the color for the current state.
-	return [self colorForState:self.state];
-}
-#endif
-
 //----------------------------------------------------------------------------
 // Override state setter methods so we can update the colorLayer
 // when there is a state change.  
@@ -175,7 +161,7 @@ StateType stateFromUIControlState(UIControlState aState)
 {
 	if (super.isSelected != newSelected) {
 		[super setSelected:newSelected];
-		NSLog(@"%d selected=%@", newSelected, [self titleForState:UIControlStateSelected]);
+		DLog(@"%d selected=%@", newSelected, [self titleForState:UIControlStateSelected]);
 		[self updateColorLayerForCurrentState];
 	}
 }
@@ -184,7 +170,7 @@ StateType stateFromUIControlState(UIControlState aState)
 {
 	if (super.isEnabled != newEnabled) {
 		[super setEnabled:newEnabled];
-		NSLog(@"%d disabled=%@", newEnabled, [self titleForState:UIControlStateDisabled]);
+		DLog(@"%d disabled=%@", newEnabled, [self titleForState:UIControlStateDisabled]);
 		[self updateColorLayerForCurrentState];
 	}
 }
@@ -193,10 +179,52 @@ StateType stateFromUIControlState(UIControlState aState)
 {
 	if (super.isHighlighted != newHighlighted) {
 		[super setHighlighted:newHighlighted];
-		NSLog(@"%d highlighted=%@", newHighlighted, [self titleForState:UIControlStateHighlighted]);
+		DLog(@"%d highlighted=%@", newHighlighted, [self titleForState:UIControlStateHighlighted]);
 		[self updateColorLayerForCurrentState];
 	}
 }
 
+//----------------------------------------------------------------------------
+// handle the spinner view animation  
+//----------------------------------------------------------------------------
+-(UIActivityIndicatorView*)spinnerView 
+{
+    if (spinnerView==nil) {
+        CGRect aFrame = self.bounds;
+        aFrame.size.height -= kSpinnerInset;
+        aFrame.size.width  = aFrame.size.height;    // make it square
+        aFrame.origin.x = (self.bounds.size.width-aFrame.size.width) * 0.5f;
+        
+        spinnerView = [[UIActivityIndicatorView alloc] initWithFrame:aFrame];
+        spinnerView.hidden = YES;       // initial state
+        
+        [self addSubview:spinnerView];  // add to button
+    }
+    return [[spinnerView retain] autorelease];
+}
+
+-(BOOL)busy {
+    // don't use getter for spinnerView to avoid allocating the view
+    // when we don't really need it
+    return (spinnerView != nil) && (spinnerView.isHidden == NO);
+}
+
+-(void)setBusy:(BOOL)newBusy       // starts/stops activity spinner animation
+{
+    if (newBusy) {
+        // enable spinner animation
+        if (self.spinnerView.isHidden) {
+            spinnerView.hidden = NO;
+            [spinnerView startAnimating];
+        }
+    } else {
+        // disable spinner animation if it is already running
+        // don't alloc it unless necessary
+        if (self.busy) {
+            [spinnerView stopAnimating];
+            spinnerView.hidden = YES;
+        }
+    }
+}
 
 @end

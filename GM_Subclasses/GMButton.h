@@ -3,7 +3,7 @@
 //  NextSprinter
 //
 //  Created by Gary Morris on 3/12/11.
-//  Copyright 2011 __MyCompanyName__. All rights reserved.
+//  Copyright 2011 Gary A. Morris. All rights reserved.
 //
 
 #import <UIKit/UIKit.h>
@@ -18,9 +18,13 @@ typedef enum { stNormal, stSelected, stHighlighted, stDisabled, nStates } StateT
 	CALayer* colorLayer;
 	
 	UIColor* bgColors[nStates];	// background colors for states
+    
+    UIActivityIndicatorView* spinnerView;       // optional
 }
 
 -(void)setColor:(UIColor *)newColor forState:(UIControlState)state;
 -(UIColor*)colorForState:(UIControlState)state;
+
+@property (assign, nonatomic) BOOL busy;    // status of activity indicator
 
 @end
