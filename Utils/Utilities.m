@@ -9,6 +9,8 @@
 
 #include "Utilities.h"
 #import <UIKit/UIKit.h>
+#include <sys/types.h> 
+#include <sys/sysctl.h> 
 #import "mach/mach.h"
 
 #ifdef FLURRYAPI
@@ -394,7 +396,7 @@ void listFiles(NSString* directory)
 		directory = documentsPath();
 	}
 	NSFileManager* fileMgr = [NSFileManager defaultManager];
-    NSArray* filenames = [fileMgr directoryContentsAtPath:directory];
+    NSArray* filenames = [fileMgr contentsOfDirectoryAtPath:directory error:NULL];
 	NSDateFormatter* dateFmtr = [NSDateFormatter new];
 	[dateFmtr setDateFormat:@"yyyy-MM-dd HH:mm"];
 	
