@@ -22,6 +22,8 @@ typedef enum { stNormal, stSelected, stHighlighted, stDisabled, nStates } StateT
     UIActivityIndicatorView* spinnerView;       // optional
 }
 
++(id)buttonWithType:(UIButtonType)buttonType Color:(UIColor *)color Frame:(CGRect)newFrame;
+
 -(void)setColor:(UIColor *)newColor forState:(UIControlState)state;
 -(UIColor*)colorForState:(UIControlState)state;
 
