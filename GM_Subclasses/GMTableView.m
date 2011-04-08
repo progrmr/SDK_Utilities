@@ -104,7 +104,7 @@
 
 -(void)setFrame:(CGRect)newFrame
 {
-#if 0
+#if 1
 	NSLog(@"%s new=%3.0f,%3.0f %3.0f,%3.0f", __PRETTY_FUNCTION__,
 		  newFrame.origin.x, newFrame.origin.y,
 		  newFrame.size.width, newFrame.size.height);
