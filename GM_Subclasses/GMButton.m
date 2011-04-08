@@ -24,6 +24,19 @@
     [super dealloc];
 }
 
++(id)buttonWithType:(UIButtonType)buttonType Color:(UIColor *)color Frame:(CGRect)newFrame
+{
+    GMButton* button = [super buttonWithType:buttonType];
+    
+    if ((self = (id)button)) {
+        // initialize
+        button.frame = newFrame;
+        button.backgroundColor = color;
+        [self awakeFromNib];
+    }
+    return self;
+}
+
 //----------------------------------------------------------------------------
 // NOTE: background color and title must be set in IB (Interface Builder)
 //----------------------------------------------------------------------------
@@ -136,6 +149,11 @@ StateType stateFromUIControlState(UIControlState aState)
 	}
 	
 	return [[color retain] autorelease];
+}
+
+-(UIColor*)backgroundColor
+{
+    return [self colorForState:UIControlStateNormal];
 }
 
 //----------------------------------------------------------------------------
