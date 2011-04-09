@@ -8,6 +8,7 @@
 
 #import "GMButton.h"
 #import "Utilities.h"
+#import "UtilitiesUI.h"
 
 @implementation GMButton
 
@@ -24,14 +25,26 @@
     [super dealloc];
 }
 
-+(id)buttonWithType:(UIButtonType)buttonType Color:(UIColor *)color Frame:(CGRect)newFrame
+-(id)initWithFrame:(CGRect)newFrame
 {
-    GMButton* button = [super buttonWithType:buttonType];
+    GMButton* button = [super initWithFrame:newFrame];
     
     if ((self = (id)button)) {
         // initialize
         button.frame = newFrame;
-        button.backgroundColor = color;
+        [self awakeFromNib];
+    }
+    return self;
+
+}
+
++(id)buttonWithFrame:(CGRect)newFrame
+{
+    GMButton* button = [super buttonWithType:UIButtonTypeCustom];
+    
+    if ((self = (id)button)) {
+        // initialize
+        button.frame = newFrame;
         [self awakeFromNib];
     }
     return self;
@@ -52,7 +65,10 @@
 	self.layer.needsDisplayOnBoundsChange = YES;
 
 	// remove background color provided and save it in bgColors[]
-	bgColors[stNormal] = [super.backgroundColor retain];  // retain, bypassing setter
+    // (but don't overwrite bgColors if backgroundColor is not set)
+    if (super.backgroundColor) {
+        bgColors[stNormal] = [super.backgroundColor retain];  // retain, bypassing setter
+    }
 	super.backgroundColor = nil;		// no longer needed
 	
 	//----------------------------------------
@@ -87,7 +103,10 @@
 	// add color layer
 	//---------------------------
 	colorLayer = [[CALayer layer] retain];
-	colorLayer.backgroundColor = bgColors[stNormal] ? bgColors[stNormal].CGColor : nil;
+    
+    CGColorRef colorRef = bgColors[stNormal] ? bgColors[stNormal].CGColor : nil;
+	colorLayer.backgroundColor = colorRef;
+    
 	colorLayer.frame = CGRectInset(bounds, kBevelInset, kBevelInset);
 	colorLayer.cornerRadius = cRadius;
 	colorLayer.needsDisplayOnBoundsChange = YES;
@@ -151,13 +170,14 @@ StateType stateFromUIControlState(UIControlState aState)
 	return [[color retain] autorelease];
 }
 
+// override backgroundColor, use colorForState: instead
 -(UIColor*)backgroundColor
 {
     return [self colorForState:UIControlStateNormal];
 }
 
 //----------------------------------------------------------------------------
-// setBackgroundColor:forState:  -- sets the color for a states
+// setColor:forState:  -- sets the color for a states
 //----------------------------------------------------------------------------
 -(void)setColor:(UIColor *)newColor forState:(UIControlState)aState
 {
@@ -169,6 +189,12 @@ StateType stateFromUIControlState(UIControlState aState)
 
 	// we may have updated the color that applies to the current state
 	[self updateColorLayerForCurrentState];
+}
+
+// override setBackgroundColor:, use setColor:forState: instead
+-(void)setBackgroundColor:(UIColor *)newColor
+{
+    [self setColor:newColor forState:UIControlStateNormal];
 }
 
 //----------------------------------------------------------------------------
@@ -197,7 +223,7 @@ StateType stateFromUIControlState(UIControlState aState)
 {
 	if (super.isHighlighted != newHighlighted) {
 		[super setHighlighted:newHighlighted];
-		DLog(@"%d highlighted=%@", newHighlighted, [self titleForState:UIControlStateHighlighted]);
+		///DLog(@"%d highlighted=%@", newHighlighted, [self titleForState:UIControlStateHighlighted]);
 		[self updateColorLayerForCurrentState];
 	}
 }
