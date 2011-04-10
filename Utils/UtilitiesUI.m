@@ -375,17 +375,38 @@ void dumpView(UIView* aView, NSString* indent)
 	if (aView) {
 		NSLog(@"%@%@", indent, aView);		// dump this view
 		
-		if (aView.subviews.count > 0) {
-			NSString* subIndent = [[NSString alloc] initWithFormat:@"%@%@", 
-							indent, ([indent length]/2)%2==0 ? @"| " : @": "];
-		
+        NSString* subIndent = [[NSString alloc] initWithFormat:@"%@%@", 
+                               indent, ([indent length]/2)%2==0 ? @"| " : @": "];
+
+        dumpLayer(aView.layer, subIndent);
+        
+		if (aView.subviews.count > 0) {		
 			// dump its subviews
 			for (UIView* aSubview in aView.subviews) dumpView( aSubview, subIndent );
 			
-			[subIndent release];
 		}
+        
+        [subIndent release];
 	}
 }
+
+void dumpLayer(CALayer* aLayer, NSString* indent) 
+{
+    if (aLayer) {
+        NSLog(@"%@%@ frame=%@", indent, aLayer, NSStringFromCGRect(aLayer.frame));     // dump this layer
+        
+        if (aLayer.sublayers.count > 0) {
+			NSString* subIndent = [[NSString alloc] initWithFormat:@"%@%@", 
+                                   indent, ([indent length]/2)%2==0 ? @"| " : @": "];
+            
+			// dump its subviews
+			for (CALayer* aSublayer in aLayer.sublayers) dumpLayer( aSublayer, subIndent );
+			
+			[subIndent release];
+		}
+    }
+}
+
 #endif
 
 @end

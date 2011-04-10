@@ -124,6 +124,7 @@ void setNavController(UINavigationController* newNavController);
 //-----------------------------------------------------------------------------
 void dumpWindows();		
 void dumpView(UIView* aView, NSString* indent);
+void dumpLayer(CALayer* aLayer, NSString* indent);
 #endif
 
 @end
