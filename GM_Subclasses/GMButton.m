@@ -25,6 +25,22 @@
     [super dealloc];
 }
 
+-(void)layoutSubviews
+{
+	CGRect bounds  = self.bounds;
+    bevelLayer.frame = bounds;
+	colorLayer.frame = CGRectInset(bounds, kBevelInset, kBevelInset);
+    glossLayer.frame = colorLayer.frame;
+
+    // modify bounds to make spinnerview square and centered
+    bounds.size.height -= kSpinnerInset;
+    bounds.size.width  = bounds.size.height;    // make it square
+    bounds.origin.x = (self.bounds.size.width-bounds.size.width) * 0.5f;
+    spinnerView.frame = bounds;
+    
+    [super layoutSubviews];
+}
+
 -(id)initWithFrame:(CGRect)newFrame
 {
     GMButton* button = [super initWithFrame:newFrame];
@@ -58,7 +74,6 @@
 	CGRect  bounds  = self.bounds;
 	CGFloat cRadius = bounds.size.height * 0.20f;	// 20% height is good
 	
-	self.autoresizingMask    = UIViewAutoresizingFlexibleWidth;
 	self.autoresizesSubviews = YES;
 	self.layer.masksToBounds = YES;
 	self.layer.cornerRadius  = cRadius;	
@@ -234,12 +249,7 @@ StateType stateFromUIControlState(UIControlState aState)
 -(UIActivityIndicatorView*)spinnerView 
 {
     if (spinnerView==nil) {
-        CGRect aFrame = self.bounds;
-        aFrame.size.height -= kSpinnerInset;
-        aFrame.size.width  = aFrame.size.height;    // make it square
-        aFrame.origin.x = (self.bounds.size.width-aFrame.size.width) * 0.5f;
-        
-        spinnerView = [[UIActivityIndicatorView alloc] initWithFrame:aFrame];
+        spinnerView = [[UIActivityIndicatorView alloc] initWithFrame:CGRectZero];
         spinnerView.hidden = YES;       // initial state
         
         [self addSubview:spinnerView];  // add to button
@@ -259,6 +269,7 @@ StateType stateFromUIControlState(UIControlState aState)
         // enable spinner animation
         if (self.spinnerView.isHidden) {
             spinnerView.hidden = NO;
+            [self setNeedsLayout];      // reposition spinner
             [spinnerView startAnimating];
         }
     } else {
