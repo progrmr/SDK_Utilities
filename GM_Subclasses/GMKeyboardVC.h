@@ -9,7 +9,7 @@
 #import <Foundation/Foundation.h>
 
 // This UIViewController subclass handles keyboard notifications and 
-// moves the view so that the field being edited is not obsucred by
+// moves the view so that the field being edited is not obscured by
 // the popup keyboard
 
 @interface GMKeyboardVC : UIViewController {
