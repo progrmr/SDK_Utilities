@@ -12,6 +12,8 @@
 
 @implementation GMButton
 
+@synthesize info;
+
 #define kBevelInset (0.75f)   /* in pixels */
 #define kSpinnerInset (2)     /* in pixels */
 #define kFontSize (14)
@@ -21,6 +23,7 @@
 	[colorLayer release];
 	[glossLayer release];
 	[spinnerView release];
+    [info        release];
     
     [super dealloc];
 }
@@ -54,6 +57,8 @@
 // NOTE: background color and title must be set in IB (Interface Builder)
 //----------------------------------------------------------------------------
 -(void)awakeFromNib {
+    [super awakeFromNib];
+    
 	// Initialization code
 	CGRect  bounds  = self.bounds;
 	CGFloat cRadius = bounds.size.height * 0.20f;	// 20% height is good
@@ -123,7 +128,10 @@
 	glossLayer.needsDisplayOnBoundsChange = YES;
 	[self.layer addSublayer:glossLayer];
 	
+    [self bringSubviewToFront:self.imageView];
 	[self bringSubviewToFront:self.titleLabel];
+    
+    ///dumpView(self, @"");
 }
 
 //----------------------------------------------------------------------------
