@@ -11,6 +11,10 @@
 
 @interface GMButtonPeaked : UIButton {
     
+    CGFloat peakHeight;
+    
 }
+
+@property (nonatomic, assign) CGFloat peakHeight;
 
 @end

@@ -11,6 +11,38 @@
 
 @implementation GMButtonPeaked
 
+@synthesize peakHeight;
+
+-(void)awakeFromNib
+{
+    peakHeight = 0;
+    [super awakeFromNib];
+}
+
+-(id)initWithFrame:(CGRect)newFrame
+{
+    GMButtonPeaked* button = [super initWithFrame:newFrame];
+    
+    if ((self = (id)button)) {
+        // initialize
+        peakHeight = 0;
+    }
+    return self;
+    
+}
+
++(id)buttonWithFrame:(CGRect)newFrame
+{
+    GMButtonPeaked* button = [super buttonWithType:UIButtonTypeCustom];
+    
+    if ((self = (id)button)) {
+        // initialize
+        button.frame = newFrame;
+        button.peakHeight = 0;
+    }
+    return self;
+}
+
 -(void)addRectWithPeaks:(CGContextRef)ctx 
                    Rect:(CGRect)r 
            MinXPeakSize:(CGFloat)minXPeakSize	  // negative for an inset peak
@@ -32,7 +64,7 @@
     
     CGContextRef ctx = UIGraphicsGetCurrentContext();
 
-    [self addRectWithPeaks:ctx Rect:rect MinXPeakSize:20 MaxXPeakSize:0];
+    [self addRectWithPeaks:ctx Rect:rect MinXPeakSize:peakHeight MaxXPeakSize:0];
     
     CGContextSetRGBFillColor(ctx, 1, 1, 0, 1);
     CGContextFillPath(ctx);
