@@ -19,7 +19,8 @@ typedef enum { stNormal, stSelected, stHighlighted, stDisabled, nStates } StateT
 	
 	UIColor* bgColors[nStates];	// background colors for states
     
-    UIActivityIndicatorView* spinnerView;       // optional
+    UIActivityIndicatorView* spinnerView;   // optional
+    id info;                                // optional button info
 }
 
 +(id)buttonWithFrame:(CGRect)newFrame;
@@ -28,6 +29,7 @@ typedef enum { stNormal, stSelected, stHighlighted, stDisabled, nStates } StateT
 -(void)setColor:(UIColor *)newColor forState:(UIControlState)state;
 -(UIColor*)colorForState:(UIControlState)state;
 
-@property (assign, nonatomic) BOOL busy;    // status of activity indicator
+@property (nonatomic, assign) BOOL busy;    // status of activity indicator
+@property (nonatomic, retain) id info;      // optional info to go with button
 
 @end
