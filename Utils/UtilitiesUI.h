@@ -12,6 +12,9 @@
 	
 }
 
+#define newUICOLOR(r,g,b,a) ([[UIColor alloc] initWithRed:(r/255.0f) green:(g/255.0f) blue:(b/255.0f) alpha:(a/255.0f)])
+
+
 //-----------------------------------------------------------------------------
 // addConvexHighlightToLayer - creates a new layer and adds it to the given layer
 //		this highlight brightens the top half, darkens the bottom half to
@@ -117,13 +120,13 @@ UINavigationController* navController();
 
 void setNavController(UINavigationController* newNavController);
 
-#if DEBUG
+#ifdef DEBUG
 //-----------------------------------------------------------------------------
 // dumpWindows - prints the windows and their subview hierarchy in console log
 // dumpView    - prints the view hierarchy to the console log
 //-----------------------------------------------------------------------------
 void dumpWindows();		
-void dumpView(UIView* aView, NSString* indent);
+void dumpView(UIView* aView, NSString* indent, BOOL showLayers);
 void dumpLayer(CALayer* aLayer, NSString* indent);
 #endif
 

@@ -8,7 +8,6 @@
  */
 
 #include "Utilities.h"
-#import <UIKit/UIKit.h>
 #include <sys/types.h> 
 #include <sys/sysctl.h> 
 #import "mach/mach.h"
@@ -128,22 +127,22 @@
 //============================================================================
 // Given a date/time, return the NSDate for a date X days in the future
 // (if daysOffset > 0) or X days in the past (if daysOffset < 0)
-//
-// Note: the time returned will be somewhere around noon on the right day,
-//       use dateFromDate:withHour:Minute:Second if you need a specific time of day
 //============================================================================
 +(NSDate*) getRelativeDate:(NSDate*)fromDate DaysOffset:(int)daysOffset
 {
-	enum { SECS_PER_DAY=86400 };		// numbers of seconds in a day
-	
-	// Calculate NSDate for noon on the given date
-	NSDate* noon = [Utilities dateFromDate:fromDate withHour:12 Minute:0 Second:0];
-	// convert to seconds
-	NSTimeInterval tmpSecs = [noon timeIntervalSinceReferenceDate];
-	// Shift the date/time (in seconds) to a new date X days away:
-	tmpSecs += daysOffset * SECS_PER_DAY;
-	// convert back to NSDate and return the result
-	return [NSDate dateWithTimeIntervalSinceReferenceDate:tmpSecs];
+    // set up date components
+    NSDateComponents *components = [[NSDateComponents alloc] init];
+    [components setDay:daysOffset];
+    
+    // get the calendar
+    NSCalendar *cal = [NSCalendar currentCalendar];
+    
+    // add the days offset to the date
+    NSDate* result = [cal dateByAddingComponents:components toDate:fromDate options:0];
+    
+    [components release];
+    return result;
+
 }
 
 //============================================================================
@@ -160,10 +159,12 @@
 {
 	NSDate* weekStartDate = [[[NSDate alloc] init] autorelease];
 	
+#if TARGET_OS_IPHONE
 #ifndef NS_BLOCK_ASSERTIONS
 	[Utilities notImplementedYet:@"getStartOfWeek"];
 #endif
-	
+#endif
+    
 	return weekStartDate;
 }
 
@@ -175,8 +176,8 @@
 	NSCalendar* curCalendar = [NSCalendar currentCalendar];
 	const unsigned units    = NSHourCalendarUnit | NSMinuteCalendarUnit;
 	NSDateComponents* comps = [curCalendar components:units fromDate:time];
-	int hour = [comps hour];
-	int min  = [comps minute];
+	NSInteger hour = [comps hour];
+	NSInteger min  = [comps minute];
 
 	return (hour * 60) + min;
 }
@@ -223,9 +224,9 @@
 	if ([str length] >= len) return [NSString stringWithString:str];	// return a copy
 	
 	// insert spaces before and after to pad it up to length characters
-	int nSpaces = len - [str length];	
-	int rSpaces = nSpaces / 2;		// truncates if odd number
-	int lSpaces = nSpaces - rSpaces;
+	unsigned nSpaces = (unsigned) (len - [str length]);	
+	unsigned rSpaces = nSpaces / 2;		// truncates if odd number
+	unsigned lSpaces = nSpaces - rSpaces;
 	if (rSpaces+1 == lSpaces) rSpaces++;	// balance odd number
 	
 	NSMutableString* newStr = [[[NSMutableString alloc] init] autorelease];
@@ -236,6 +237,7 @@
 	return newStr;
 }
 
+#if TARGET_OS_IPHONE
 +(void)showMessage:(NSString*)message title:(NSString*)title
 {
 	NSLog(@"%@ %@", title, message);
@@ -264,6 +266,7 @@
 size_t sizeofUIImage(UIImage* image) {
     return CGImageGetBytesPerRow(image.CGImage) * CGImageGetHeight(image.CGImage);
 }
+#endif
 
 vm_size_t usedMemory(void) {
 	struct task_basic_info info;
@@ -287,7 +290,7 @@ vm_size_t usedMemory(void) {
 }
 #endif
 
-natural_t freeMemory(void) {
+vm_size_t freeMemory(void) {
     mach_port_t           host_port = mach_host_self();
     mach_msg_type_number_t host_size = sizeof(vm_statistics_data_t) / sizeof(integer_t);
     vm_size_t              pagesize;
@@ -314,6 +317,7 @@ void logMemUsage(void) {
 	}
 }
 
+#if TARGET_OS_IPHONE
 //-----------------------------------------------------------------------------
 // Checks the value to see if it is between min..max, if so no alert is
 // displayed and the value is returned unchanged.
@@ -376,6 +380,7 @@ BOOL hasMultitasking()
 	}
 	return NO;
 }
+#endif
 
 //----------------------------------------------------------------------
 // returns the fullpath of the app's Documents folder
@@ -400,21 +405,23 @@ void listFiles(NSString* directory)
 	NSDateFormatter* dateFmtr = [NSDateFormatter new];
 	[dateFmtr setDateFormat:@"yyyy-MM-dd HH:mm"];
 	
-	NSLog(@"%d files in %@", [filenames count], directory);
+	NSLog(@"%u files in %@", (unsigned)[filenames count], directory);
 	
 	[fileMgr changeCurrentDirectoryPath:directory];
 	
     for (NSString* filename in filenames){
 		NSDictionary* dict = [fileMgr attributesOfItemAtPath:filename error:NULL];
-		uint32_t perms  = [dict filePosixPermissions];
+		NSUInteger perms  = [dict filePosixPermissions];
 		NSString* owner = [dict fileOwnerAccountName];
 		NSString* group = [dict fileGroupOwnerAccountName];
 		uint64_t size   = [dict fileSize];
 		NSDate* date    = [dict fileModificationDate];
 		
-        NSLog(@"File: %03o %@ %@ %6qu %@ %@", 
-			  perms, owner, group, size, [dateFmtr stringFromDate:date], filename);
+        NSLog(@"File: %03u %@ %@ %6qu %@ %@", 
+			  (unsigned)perms, owner, group, size, [dateFmtr stringFromDate:date], filename);
     }
+    
+    [dateFmtr release];
 }
 
 //----------------------------------------------------------------------
@@ -473,6 +480,31 @@ char charFromFourBits(uint8_t fourBits) {
     } else {
         return 'A' + (fourBits - 10);
     }
+}
+
+//----------------------------------------------------------------------------
+// uByteFrom2HexChars
+//----------------------------------------------------------------------------
+uint8_t uByteFrom2HexChars(const char* chars)
+{
+    return fourBitsFromHexChar(chars[0])*16 + fourBitsFromHexChar(chars[1]);    
+}
+
+//----------------------------------------------------------------------------
+// GMLog -- same as NSLog but without the date/time/process id stuff
+//----------------------------------------------------------------------------
+void GMLog(NSString *format, ...)
+{
+    va_list args;    
+    va_start (args, format);
+    
+    NSString* string = [[NSString alloc] initWithFormat:format  arguments:args];
+    
+    va_end (args);
+    
+    fprintf (stderr, "%s\n", [string UTF8String]);
+    
+    [string release];
 }
 
 @end

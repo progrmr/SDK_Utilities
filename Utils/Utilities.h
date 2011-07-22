@@ -9,6 +9,10 @@
 
 #import <Foundation/Foundation.h>
 
+#if TARGET_OS_IPHONE
+#import <UIKit/UIKit.h>
+#endif
+
 #ifdef DEBUG
 #define DLog(fmt, ...) NSLog((@"%s " fmt), __PRETTY_FUNCTION__, ##__VA_ARGS__);
 #else
@@ -77,9 +81,6 @@ typedef unsigned short MinuteOfTheDay;		// time of day in minutes from midnight
 //============================================================================
 // Given a date/time, return the NSDate for a date X days in the future
 // (if daysOffset > 0) or X days in the past (if daysOffset < 0)
-//
-// Note: the time returned will be somewhere around noon on the right day,
-//       use newTimeFromDate if you need a specific time of day
 //============================================================================
 +(NSDate*) getRelativeDate:(NSDate*)fromDate DaysOffset:(int)daysOffset;
 
@@ -111,6 +112,7 @@ typedef unsigned short MinuteOfTheDay;		// time of day in minutes from midnight
 //-----------------------------------------------------------------------------
 +(NSString*)centerStringWithPadding:(NSString*)str Length:(int)len;
 
+#if TARGET_OS_IPHONE
 //-----------------------------------------------------------------------------
 // Checks the value to see if it is between min..max, if so no alert is
 // displayed and the value is returned unchanged.
@@ -128,14 +130,17 @@ typedef unsigned short MinuteOfTheDay;		// time of day in minutes from midnight
 // Creates an object from a nib file
 //----------------------------------------------------------------------
 +(id)loadNib:(NSString*)nibName ClassName:(NSString*)className Owner:(id)owner;
+#endif
 
 //----------------------------------------------------------------------
 // returns memory usage/free in bytes
 //----------------------------------------------------------------------
 vm_size_t usedMemory(void);
-natural_t freeMemory(void);
-size_t sizeofUIImage(UIImage* image);
+vm_size_t freeMemory(void);
 void logMemUsage(void);		// writes used/free w/NSLog if changed
+
+#if TARGET_OS_IPHONE
+size_t sizeofUIImage(UIImage* image);
 
 //----------------------------------------------------------------------
 // Displays an alert telling that the "what" is not implemented yet
@@ -144,6 +149,7 @@ void logMemUsage(void);		// writes used/free w/NSLog if changed
 //----------------------------------------------------------------------
 #ifndef NS_BLOCK_ASSERTIONS
 +(void)notImplementedYet:(NSString*)what;
+#endif
 #endif
 
 //----------------------------------------------------------------------
@@ -185,6 +191,16 @@ uint8_t fourBitsFromHexChar(char hexChar);
 // charFromFourBits - input: 0..15, output: '0'..'9','A'..'F'
 //----------------------------------------------------------------------------
 char charFromFourBits(uint8_t fourBits);
+
+//----------------------------------------------------------------------------
+// uByteFrom2HexChars
+//----------------------------------------------------------------------------
+uint8_t uByteFrom2HexChars(const char* chars);
+
+//----------------------------------------------------------------------------
+// GMLog -- same as NSLog but without the date/time/process id stuff
+//----------------------------------------------------------------------------
+void GMLog(NSString *format, ...);
 
 @end
 

@@ -72,8 +72,8 @@ double headingInRadians(double lat1, double lon1, double lat2, double lon2)
 	//
 	// Spherical Law of Cosines
 	//
-	// Formula: θ = atan2( 	sin(Δlong) * cos(lat2),
-	//						cos(lat1) * sin(lat2) − sin(lat1) * cos(lat2) * cos(Δlong) )
+	// Formula: θ = atan2( 	sin(Δlon) * cos(lat2),
+	//						cos(lat1) * sin(lat2) − sin(lat1) * cos(lat2) * cos(Δlon) )
 	// JavaScript: 	
 	//	
 	//	var y = Math.sin(dLon) * Math.cos(lat2);

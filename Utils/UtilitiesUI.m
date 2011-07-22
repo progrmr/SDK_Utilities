@@ -354,7 +354,7 @@ void setNavController(UINavigationController* newNavController)
 	appNavController = newNavController;
 }
 
-#if DEBUG
+#ifdef DEBUG
 //-----------------------------------------------------------------------------
 // dumpWindows
 //-----------------------------------------------------------------------------
@@ -362,7 +362,7 @@ void dumpWindows()
 {
 	// dump all the windows
 	for (UIWindow* window in [UIApplication sharedApplication].windows) {
-		dumpView(window, @"dumpView: ");
+		dumpView(window, @"dumpView: ", NO);
 	}
 		
 }
@@ -370,7 +370,7 @@ void dumpWindows()
 //-----------------------------------------------------------------------------
 // dumpView
 //-----------------------------------------------------------------------------
-void dumpView(UIView* aView, NSString* indent)
+void dumpView(UIView* aView, NSString* indent, BOOL showLayers)
 {
 	if (aView) {
 		NSLog(@"%@%@", indent, aView);		// dump this view
@@ -378,11 +378,13 @@ void dumpView(UIView* aView, NSString* indent)
         NSString* subIndent = [[NSString alloc] initWithFormat:@"%@%@", 
                                indent, ([indent length]/2)%2==0 ? @"| " : @": "];
 
-        dumpLayer(aView.layer, subIndent);
+        if (showLayers) dumpLayer(aView.layer, subIndent);
         
 		if (aView.subviews.count > 0) {		
 			// dump its subviews
-			for (UIView* aSubview in aView.subviews) dumpView( aSubview, subIndent );
+			for (UIView* aSubview in aView.subviews) {
+                dumpView( aSubview, subIndent, showLayers );
+            }
 			
 		}
         
