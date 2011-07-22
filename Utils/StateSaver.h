@@ -36,6 +36,12 @@
 -(id)initWithFile:(NSString*)filename;		// filename only, no path
 
 //----------------------------------------------------------------
+// saveDataToFile: - forces a save of state data to the file, 
+// notification parameter is not used, may be nil
+//----------------------------------------------------------------
+-(void)saveDataToFile:(NSNotification*)notification;
+
+//----------------------------------------------------------------
 // Count of items in dictionary, if count is 0 after init then
 // file was not read in and you should set your default values.
 //----------------------------------------------------------------
