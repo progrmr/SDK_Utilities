@@ -1,9 +1,23 @@
 /*
  *  Utilities.m
- *  DailyPointWatch
  *
  *  Created by Gary Morris on 9/12/09.
- *  Copyright 2009 Gary A. Morris. All rights reserved.
+ *  Copyright 2009-2011 Gary A. Morris. All rights reserved.
+ *
+ * This file is part of SDK_Utilities.repo
+ *
+ * This is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This file is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this file. If not, see <http://www.gnu.org/licenses/>.
  *
  */
 
@@ -397,28 +411,41 @@ NSString* documentsPath()
 //----------------------------------------------------------------------
 void listFiles(NSString* directory)
 {
+	NSFileManager* fileMgr = [NSFileManager defaultManager];
+
 	if (directory == nil) {
 		directory = documentsPath();
 	}
-	NSFileManager* fileMgr = [NSFileManager defaultManager];
+    
+    [fileMgr changeCurrentDirectoryPath:directory];
+
     NSArray* filenames = [fileMgr contentsOfDirectoryAtPath:directory error:NULL];
 	NSDateFormatter* dateFmtr = [NSDateFormatter new];
 	[dateFmtr setDateFormat:@"yyyy-MM-dd HH:mm"];
 	
 	NSLog(@"%u files in %@", (unsigned)[filenames count], directory);
 	
-	[fileMgr changeCurrentDirectoryPath:directory];
-	
     for (NSString* filename in filenames){
+        
 		NSDictionary* dict = [fileMgr attributesOfItemAtPath:filename error:NULL];
+        NSString* fileType = [dict objectForKey:NSFileType];
 		NSUInteger perms  = [dict filePosixPermissions];
 		NSString* owner = [dict fileOwnerAccountName];
 		NSString* group = [dict fileGroupOwnerAccountName];
 		uint64_t size   = [dict fileSize];
 		NSDate* date    = [dict fileModificationDate];
 		
-        NSLog(@"File: %03u %@ %@ %6qu %@ %@", 
+        NSLog(@"File: %c %03u %@ %@ %6qu %@ %@", 
+              fileType == NSFileTypeDirectory ? 'd' : ' ',
 			  (unsigned)perms, owner, group, size, [dateFmtr stringFromDate:date], filename);
+        
+        if (fileType == NSFileTypeDirectory) {
+            NSString* subdir = [directory stringByAppendingPathComponent:filename];
+            listFiles(subdir);
+            
+            // change back to current directory
+            [fileMgr changeCurrentDirectoryPath:directory];
+        }
     }
     
     [dateFmtr release];
@@ -456,6 +483,43 @@ void logEvent(NSString* description)
 	NSLog(@"logEvent: %@", description);
 #endif		
 }
+
+void logError(NSString* error, NSString* format, ...)
+{
+    va_list args;    
+    va_start (args, format);
+    
+    NSString* message = [[NSString alloc] initWithFormat:format arguments:args];
+    
+    va_end (args);
+    
+#ifdef FLURRYAPI
+	// count/log events using the FlurryAPI
+	[FlurryAPI logError:error message:message exception:NULL];
+#endif		
+	NSLog(@"ERROR: %@ %@", error, message);
+    
+    [message release];
+}
+
+void logException(NSException* exc, NSString* format, ...)
+{
+    va_list args;    
+    va_start (args, format);
+    
+    NSString* message = [[NSString alloc] initWithFormat:format arguments:args];
+    
+    va_end (args);
+    
+#ifdef FLURRYAPI
+	// count/log events using the FlurryAPI
+	[FlurryAPI logError:@"exception" message:message exception:exc];
+#endif		
+	NSLog(@"ERROR: %@, %@, %@", exc.name, exc.reason, message);
+    
+    [message release];
+}
+
 
 //----------------------------------------------------------------------------
 // fourBitsFromHexChar
@@ -507,7 +571,59 @@ void GMLog(NSString *format, ...)
     [string release];
 }
 
+//----------------------------------------------------------------------------
+// isCompatibleWithMinReqdVersion:
+//    version number compatibility check
+//    returns YES if the bundle version >= minReqdVersion  
+//    Version strings are of the format: 3.0, 1.0, 1.1.1, 3.1.4.888, etc. 
+//----------------------------------------------------------------------------
++(BOOL)isCompatibleWithMinReqdVersion:(NSString*)minReqdVersion
+{
+    if (minReqdVersion==nil) return YES;        // no requirement
+    
+    NSDictionary* infoDict = [[NSBundle mainBundle] infoDictionary];
+    NSString* runningVersion = [infoDict objectForKey:@"CFBundleVersion"];
+
+    NSArray* minReqdArray = [minReqdVersion componentsSeparatedByString:@"."];
+    NSArray* runningArray = [runningVersion componentsSeparatedByString:@"."];
+    
+    // run thru the major, minor and subminor versions and compare
+    for (NSUInteger level=0; level<[minReqdArray count]; level++) {
+        // check to see if the requirement is met
+        
+        // does the running version have this level?  if not, it's old
+        // ie: running 3, reqd: 3.1, running doesn't have level 1
+        if (level >= [runningArray count]) {
+            return NO;
+            
+        } else {
+            int runInt  = [[runningArray objectAtIndex:level] intValue];
+            int reqdInt = [[minReqdArray objectAtIndex:level] intValue];
+            
+            if (runInt < reqdInt) {
+                // requirement not met, done checking
+                return NO;
+                
+            } else if (runInt > reqdInt) {
+                // all done, no need to check further levels
+                return YES;
+            }
+        }
+        
+    }
+    
+    return YES;
+}
+
 @end
+
+
+
+
+
+
+
+
 
 
 

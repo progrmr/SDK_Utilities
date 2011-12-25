@@ -1,10 +1,24 @@
 //
 //  UtilitiesUI.m
-//  Clock
 //
-//  Created by Gary Morris on 3/12/10.
-//  Copyright 2010 Gary A. Morris. All rights reserved.
-//
+/*  Created by Gary Morris on 3/12/10.
+ *  Copyright 2010-2011 Gary A. Morris. All rights reserved.
+ *
+ * This file is part of SDK_Utilities.repo
+ *
+ * This is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This file is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this file. If not, see <http://www.gnu.org/licenses/>.
+ */
 
 #import "UtilitiesUI.h"
 #import "UIColor-Expanded.h"
@@ -410,6 +424,23 @@ void dumpLayer(CALayer* aLayer, NSString* indent)
 }
 
 #endif
+
+
+//-----------------------------------------------------------------------------
+// tellParentToDismissModalVC (was dismissModalViewController)
+// exit this view controller, return to parent, handle iOS 5 change
+//-----------------------------------------------------------------------------
+///#pragma GCC diagnostic ignored "-Wwarning-flag"
+void tellParentToDismissModalVC(UIViewController* viewController)
+{
+    if ([viewController respondsToSelector:@selector(presentingViewController)]) {
+        id presenter = [viewController performSelector:@selector(presentingViewController)];
+        [presenter dismissViewControllerAnimated:YES completion: ^{ /* cleanup */ }];
+        
+    } else {
+        [[viewController parentViewController] dismissModalViewControllerAnimated:YES];
+    }
+}
 
 @end
 

@@ -1,10 +1,23 @@
 /*
  *  Utilities.h
- *  DailyPointWatch
  *
  *  Created by Gary Morris on 9/12/09.
- *  Copyright 2009 Gary A. Morris. All rights reserved.
+ *  Copyright 2009-2011 Gary A. Morris. All rights reserved.
  *
+ * This file is part of SDK_Utilities.repo
+ *
+ * This is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This file is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this file. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #import <Foundation/Foundation.h>
@@ -179,6 +192,8 @@ BOOL isFileInDocuments(NSURL* fileURL);
 // logs to NSLog (if FLURRYAPI is not defined)
 //----------------------------------------------------------------------
 void logEvent(NSString* description); 
+void logError(NSString* error, NSString* format, ...);
+void logException(NSException* exception, NSString* format, ...);
 
 //----------------------------------------------------------------------------
 // fourBitsFromHexChar
@@ -201,6 +216,14 @@ uint8_t uByteFrom2HexChars(const char* chars);
 // GMLog -- same as NSLog but without the date/time/process id stuff
 //----------------------------------------------------------------------------
 void GMLog(NSString *format, ...);
+
+//----------------------------------------------------------------------------
+// isCompatibleWithMinReqdVersion:
+//    version number compatibility check
+//    returns YES if the bundle version >= minReqdVersion  
+//    Version strings are of the format: 3.0, 1.0, 1.1.1, 3.1.4.888, etc. 
+//----------------------------------------------------------------------------
++(BOOL)isCompatibleWithMinReqdVersion:(NSString*)minReqdVersion;
 
 @end
 
