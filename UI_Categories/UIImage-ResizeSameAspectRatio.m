@@ -90,7 +90,7 @@
 	
 	size_t bytesPerRow = CGImageGetBytesPerRow(imageRef);
 #if DEBUG	
-	NSLog(@"%s bitmapWidth=%d bitmapHeight=%d bytesPerRow=%d", bitmapWidth, bitmapHeight, bytesPerRow);
+	NSLog(@"bitmapWidth=%lu bitmapHeight=%lu bytesPerRow=%lu", bitmapWidth, bitmapHeight, bytesPerRow);
 #endif
 	
 	CGContextRef bitmap = CGBitmapContextCreate(NULL, 
