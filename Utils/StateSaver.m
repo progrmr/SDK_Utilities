@@ -28,32 +28,40 @@
 {
 	NSMutableDictionary* tmp = nil;
 	
-	if ([[NSFileManager defaultManager] fileExistsAtPath:fullPathname]) { 
-		// Read the last updated date and points values from the plist file
-		tmp = [[NSMutableDictionary alloc] initWithContentsOfFile:fullPathname];
-		NSLog(@"%s read %d from %@", __PRETTY_FUNCTION__, [tmp count], fullPathname);
-		///NSLog(@"%@", tmp);
-		
-	} else {
-		// file not found, create empty dictionary
-		tmp = [[NSMutableDictionary alloc] initWithCapacity:6];
-		NSLog(@"%s file not found: %@", __PRETTY_FUNCTION__, fullPathname);
-	}
-	
-	self.stateData = tmp;
-	[tmp release];
+    if ([[NSFileManager defaultManager] fileExistsAtPath:fullPathname]) { 
+        // Read the last updated date and points values from the plist file
+        tmp = [[NSMutableDictionary alloc] initWithContentsOfFile:fullPathname];
+        NSLog(@"%s read %d from %@", __PRETTY_FUNCTION__, [tmp count], fullPathname);
+        ///NSLog(@"%@", tmp);
+        
+    } else {
+        // file not found, create empty dictionary
+        tmp = [[NSMutableDictionary alloc] initWithCapacity:6];
+        NSLog(@"%s file not found: %@", __PRETTY_FUNCTION__, fullPathname);
+    }
+        
+    @synchronized(self) {
+        self.stateData = tmp;
+    }
+    
+    [tmp release];
 }
 
 //----------------------------------------------------------------
 // Save state data to file - app terminating or memory low
 //----------------------------------------------------------------
 -(void)saveDataToFile:(NSNotification*)notification {
-	if ([stateData count]) {
-		// write out the dictionary to the file			
-		[stateData writeToFile:fullPathname atomically:YES];
-		NSLog(@"%s wrote %d to %@", __PRETTY_FUNCTION__, [stateData count], fullPathname);
-		///NSLog(@"%@", stateData);
-	}
+    @synchronized(self) {
+        if ([stateData count]) {
+            // write out the dictionary to the file			
+            [stateData writeToFile:fullPathname atomically:YES];
+        }
+    
+        NSLog(@"saved %d to %@", [stateData count], fullPathname);
+#ifdef DEBUG
+        NSLog(@"%@", stateData);
+#endif
+    }
 }
 
 //----------------------------------------------------------------
@@ -95,8 +103,11 @@
 		[self saveDataToFile:nil];
 	}
 	[newDict retain];
-	[stateData release];
-	stateData = newDict;
+    
+    @synchronized(self) {
+        [stateData release];
+        stateData = newDict;
+    }
 }
 
 //----------------------------------------------------------------
@@ -104,13 +115,13 @@
 //----------------------------------------------------------------
 -(id)initWithFile:(NSString*)filename
 {
-	// determine the full pathname to the state file
-	NSArray*  paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES); 
+    // determine the full pathname to the state file
+    NSArray*  paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES); 
     NSString* documentsDirectory = [paths objectAtIndex:0];
-	fullPathname = [documentsDirectory stringByAppendingPathComponent:filename];
-	[fullPathname retain];
-	
-	[self loadFromFile];
+    fullPathname = [documentsDirectory stringByAppendingPathComponent:filename];
+    [fullPathname retain];
+    
+    [self loadFromFile];
 	
 	UIApplication* app = [UIApplication sharedApplication];
 	[[NSNotificationCenter defaultCenter] addObserver:self 
@@ -139,21 +150,27 @@
 -(void)setFloatForKey:(NSString*)key value:(float)value
 {
 	NSNumber* num = [NSNumber numberWithFloat:value];
-	[self.stateData setValue:num forKey:key];
-	///NSLog(@"setFloatForKey: %@ %g", key, value);
+    @synchronized(self) {
+        [self.stateData setValue:num forKey:key];
+        ///NSLog(@"setFloatForKey: %@ %g", key, value);
+    }
 }
 
 -(void)setIntForKey:(NSString*)key value:(int)value
 {
 	NSNumber* num = [NSNumber numberWithInt:value];
-	[self.stateData setValue:num forKey:key];
-	///NSLog(@"setIntForKey: %@ %d", key, value);
+    @synchronized(self) {
+        [self.stateData setValue:num forKey:key];
+        ///NSLog(@"setIntForKey: %@ %d", key, value);
+    }
 }
 
 -(void)setObjectForKey:(NSString*)key object:(id)object
 {
-	[self.stateData setValue:object forKey:key];
-	///NSLog(@"setObjectForKey: %@ %@", key, [object class]);
+    @synchronized(self) {
+        [self.stateData setValue:object forKey:key];
+        ///NSLog(@"setObjectForKey: %@ %@", key, [object class]);
+    }
 }
 
 
@@ -162,19 +179,29 @@
 //---------------------------------------------------------------------
 -(float)floatForKey:(id)key
 {
-	NSNumber* tmpNum = [self.stateData objectForKey:key];
+    NSNumber* tmpNum = nil;
+    @synchronized(self) {
+        tmpNum = [self.stateData objectForKey:key];
+    }
 	return [tmpNum floatValue];
 }
 
 -(int)intForKey:(id)key
 {
-	NSNumber* tmpNum = [self.stateData objectForKey:key];
+    NSNumber* tmpNum = nil;
+    @synchronized(self) {
+        tmpNum = [self.stateData objectForKey:key];
+    }
 	return [tmpNum intValue];
 }
 
 -(id)objectForKey:(id)key
 {
-	return [self.stateData objectForKey:key];
+    id object = nil;
+    @synchronized(self) {
+        object = [self.stateData objectForKey:key];
+    }
+	return [[object retain] autorelease];
 }
 
 @end
