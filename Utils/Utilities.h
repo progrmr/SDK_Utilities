@@ -41,7 +41,7 @@
 	
 }
 
-typedef unsigned short MinuteOfTheDay;		// time of day in minutes from midnight
+typedef uint16_t MinuteOfTheDay;		// time of day in minutes from midnight
 
 //============================================================================
 // Determines if date/time format is set for 12 or 24 hour clock
@@ -188,7 +188,7 @@ void listFiles(NSString* directory);
 BOOL isFileInDocuments(NSURL* fileURL);
 
 //----------------------------------------------------------------------
-// logs the event to the FlurryAPI or 
+// logs the event to the FlurryAnalytics.h or 
 // logs to NSLog (if FLURRYAPI is not defined)
 //----------------------------------------------------------------------
 void logEvent(NSString* description); 
@@ -224,6 +224,13 @@ void GMLog(NSString *format, ...);
 //    Version strings are of the format: 3.0, 1.0, 1.1.1, 3.1.4.888, etc. 
 //----------------------------------------------------------------------------
 +(BOOL)isCompatibleWithMinReqdVersion:(NSString*)minReqdVersion;
+
+//----------------------------------------------------------------------------
+// NSDateFormatter localized for current language
+//----------------------------------------------------------------------------
++(NSDateFormatter*)formatterWithDateStyle:(NSDateFormatterStyle)dateStyle 
+                                timeStyle:(NSDateFormatterStyle)timeStyle;
+
 
 @end
 
