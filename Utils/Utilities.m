@@ -27,7 +27,7 @@
 #import "mach/mach.h"
 
 #ifdef FLURRYAPI
-#import "FlurryAPI.h"
+#import "FlurryAnalytics.h"
 #endif
 
 @implementation Utilities
@@ -471,14 +471,14 @@ BOOL isFileInDocuments(NSURL* fileURL)
 }
 
 //----------------------------------------------------------------------
-// logs the event to the FlurryAPI 
+// logs the event to the FlurryAnalytics.h 
 // (or to NSLog if in development)
 //----------------------------------------------------------------------
 void logEvent(NSString* description) 
 {
 #ifdef FLURRYAPI
-	// count/log events using the FlurryAPI
-	[FlurryAPI logEvent:description];
+	// count/log events using the FlurryAnalytics.h
+	[FlurryAnalytics logEvent:description];
 #else
 	NSLog(@"logEvent: %@", description);
 #endif		
@@ -494,8 +494,8 @@ void logError(NSString* error, NSString* format, ...)
     va_end (args);
     
 #ifdef FLURRYAPI
-	// count/log events using the FlurryAPI
-	[FlurryAPI logError:error message:message exception:NULL];
+	// count/log events using the FlurryAnalytics.h
+	[FlurryAnalytics logError:error message:message exception:NULL];
 #endif		
 	NSLog(@"ERROR: %@ %@", error, message);
     
@@ -512,8 +512,8 @@ void logException(NSException* exc, NSString* format, ...)
     va_end (args);
     
 #ifdef FLURRYAPI
-	// count/log events using the FlurryAPI
-	[FlurryAPI logError:@"exception" message:message exception:exc];
+	// count/log events using the FlurryAnalytics.h
+	[FlurryAnalytics logError:@"exception" message:message exception:exc];
 #endif		
 	NSLog(@"ERROR: %@, %@, %@", exc.name, exc.reason, message);
     
@@ -613,6 +613,31 @@ void GMLog(NSString *format, ...)
     }
     
     return YES;
+}
+
+//----------------------------------------------------------------------------
+// NSDateFormatter localized for current language with the styles given,
+// NOTE: a global formatter is returned, the styles are changed each time
+// this is called.  Not thread safe.
+//----------------------------------------------------------------------------
++(NSDateFormatter*)formatterWithDateStyle:(NSDateFormatterStyle)dateStyle 
+                                timeStyle:(NSDateFormatterStyle)timeStyle
+{
+    static NSDateFormatter* theFormatter = nil;     // allocate once, never release
+    
+    if (theFormatter == nil) {
+        theFormatter = [[NSDateFormatter alloc] init];
+        
+        // locale alloc once, never release
+        NSLocale* locale = [[NSLocale alloc] initWithLocaleIdentifier:[[NSLocale preferredLanguages] objectAtIndex:0]];
+        [theFormatter setLocale:locale];
+        [locale release];
+    }
+    
+    theFormatter.dateStyle = dateStyle;
+    theFormatter.timeStyle = timeStyle;
+    
+    return theFormatter;
 }
 
 @end
