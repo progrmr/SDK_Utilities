@@ -19,4 +19,6 @@
 +(id)labelWithFrame:(CGRect)newFrame;
 -(id)initWithFrame:(CGRect)newFrame;
 
+@property (nonatomic, retain) CAGradientLayer* glossLayer;
+
 @end

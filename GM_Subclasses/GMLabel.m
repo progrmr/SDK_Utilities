@@ -14,6 +14,8 @@
 #define kFontSize (14)
 #define kBevelInset (0.75f)   /* in pixels */
 
+@synthesize glossLayer;
+
 
 - (void)dealloc {
 	[glossLayer  release];
@@ -38,7 +40,7 @@
 
 +(id)labelWithFrame:(CGRect)newFrame
 {
-    return [[self alloc] initWithFrame:newFrame];
+    return [[[self alloc] initWithFrame:newFrame] autorelease];
 }
 
 //----------------------------------------------------------------------------
@@ -72,7 +74,7 @@
 	//---------------------------
 	glossLayer = [[CAGradientLayer layer] retain];
 	glossLayer.colors = [NSArray arrayWithObjects: (id)
-						 [UIColor colorWithWhite:1 alpha:0.4f].CGColor, 
+						 [UIColor colorWithWhite:1 alpha:0.5f].CGColor, 
 						 [UIColor colorWithWhite:1 alpha:0.0f].CGColor, nil];
 	glossLayer.frame        = bounds;
 	glossLayer.cornerRadius = cRadius;
