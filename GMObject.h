@@ -11,6 +11,10 @@
 
 @interface GMObject : NSObject {
     
+#ifdef DEBUG
+    int32_t myRetainCount;
+#endif
+    
 }
 
 @end
