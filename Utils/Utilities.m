@@ -338,9 +338,9 @@ void logMemUsage(void) {
 // If the value is > max or < min, then it displays an alert saying that
 // <thingName> is too much or too low and returns the min or max value
 //-----------------------------------------------------------------------------
-+(long)checkRangeAndAlert:(NSString*)thingName value:(long)value min:(long)min max:(long)max
++(long)checkRangeAndAlert:(NSString*)thingName value:(int32_t)value min:(int32_t)min max:(int32_t)max
 {
-	long tmpValue = value;
+	int32_t tmpValue = value;
 	NSString *msg = nil;
 	
 	if (tmpValue > max) {

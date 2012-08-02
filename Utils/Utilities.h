@@ -132,7 +132,7 @@ typedef uint16_t MinuteOfTheDay;		// time of day in minutes from midnight
 // If the value is > max or < min, then it displays an alert saying that
 // <thingName> is too much or too low and returns the min or max value
 //-----------------------------------------------------------------------------
-+(long)checkRangeAndAlert:(NSString*)thingName value:(long)value min:(long)min max:(long)max;
++(long)checkRangeAndAlert:(NSString*)thingName value:(int32_t)value min:(int32_t)min max:(int32_t)max;
 
 //----------------------------------------------------------------------
 // Pops up an alert box with the given titel and message
