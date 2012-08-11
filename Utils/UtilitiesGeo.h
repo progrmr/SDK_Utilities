@@ -20,6 +20,9 @@
  * along with this file. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifndef UtilitiesGeo_h
+#define UtilitiesGeo_h
+
 // distance conversion factors
 #define MILES_TO_METERS_FACTOR (1609.344)	/* exact */
 #define MILES_TO_FEET_FACTOR   (5280)		/* exact */
@@ -81,8 +84,25 @@ void destCoordsInDegrees(double lat1, double lon1,
 
 // Normalize a heading in degrees to be within -179.999999° to 180.00000°
 double normalize180(double heading);
-float normalize180f(float heading);
+float  normalize180f(float heading);
 
 // Normalize a heading in degrees to be within 0° to 359.999999°
 double normalize360(double heading);
-float normalize360f(float heading);
+float  normalize360f(float heading);
+
+/*-------------------------------------------------------------------------
+ * Compute Great Circle distance in meters from point 1 to point 2
+ * -- latitude/longitude arguments must be in radians
+ * -- result is in meters
+ *-------------------------------------------------------------------------*/
+double distanceInMetersFromRadians(double lat1, double lat2, double lon1, double lon2);
+
+/*-------------------------------------------------------------------------
+ * Compute Great Circle distance in meters from point 1 to point 2
+ * -- latitude/longitude arguments in degrees
+ * -- result is in meters
+ *-------------------------------------------------------------------------*/
+double distanceInMetersFromDegrees(double lat1, double lat2, double lon1, double lon2);
+
+#endif
+

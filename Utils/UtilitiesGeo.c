@@ -172,3 +172,39 @@ float normalize360f(float heading)
 	}
 }
 
+//----------------------------------------------------------------------------
+// Compute Great Circle distance in meters from point 1 to point 2
+// -- latitude/longitude arguments must be in radians
+// -- result is in meters
+// This implementation uses the Spherical Law of Cosines
+// (cos c = cos a cos b + sin a sin b cos C)
+// derived from:  http://www.movable-type.co.uk/scripts/latlong.html
+//----------------------------------------------------------------------------
+double distanceInMetersFromRadians(double lat1, double lat2, double lon1, double lon2)
+{
+    double distance = acos(sin(lat1) * sin(lat2) +
+                           cos(lat1) * cos(lat2) *
+                           cos(lon2 - lon1)) * EARTH_RADIUS_METERS;
+    return distance;
+}
+
+//----------------------------------------------------------------------------
+// Compute Great Circle distance in meters from point 1 to point 2
+// -- lat/lon arguments in degrees
+// -- result is in meters
+//
+// This implementation uses the Spherical Law of Cosines
+// (cos c = cos a cos b + sin a sin b cos C)
+// derived from:  http://www.movable-type.co.uk/scripts/latlong.html
+//----------------------------------------------------------------------------
+double distanceInMetersFromDegrees(double lat1, double lat2, double lon1, double lon2)
+{
+    double lat1radians = Deg_to_Rad(lat1);
+    double lat2radians = Deg_to_Rad(lat2);
+    double lon1radians = Deg_to_Rad(lon1);
+    double lon2radians = Deg_to_Rad(lon2);
+    
+    return distanceInMetersFromRadians(lat1radians, lat2radians, lon1radians, lon2radians);
+}
+
+
