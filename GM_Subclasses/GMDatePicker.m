@@ -13,21 +13,18 @@
 
 -(void)setFrame:(CGRect)newFrame
 {
-#if 0
-	NSLog(@"%s newFrame = %3.0f,%3.0f %3.0f,%3.0f", __PRETTY_FUNCTION__,
-		  newFrame.origin.x, newFrame.origin.y,
-		  newFrame.size.width, newFrame.size.height);
-#endif
-	
-	newFrame.size = [self sizeThatFits:newFrame.size];	// make it fit
-	
-	if (self.superview) {
-		CGRect parentBounds = self.superview.bounds;
-		// place it at the bottom of the screen
-		newFrame.origin.y = parentBounds.origin.y + parentBounds.size.height - newFrame.size.height;
-	}
-	
-	[super setFrame:newFrame];
+	CGSize newSize = [self sizeThatFits:newFrame.size];	// make it fit
+
+    if (newSize.height != newFrame.size.height) {
+        newFrame.size = newSize;
+        
+        if (self.superview) {
+            CGRect parentBounds = self.superview.bounds;
+            // place it at the bottom of the screen
+            newFrame.origin.y = parentBounds.origin.y + parentBounds.size.height - newFrame.size.height;
+        }        
+    }
+    [super setFrame:newFrame];
 }
 
 -(CGSize)sizeThatFits:(CGSize)size
