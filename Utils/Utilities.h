@@ -177,9 +177,10 @@ NSString* documentsPath();
 
 //----------------------------------------------------------------------
 // prints list of files w/NSLog
-// pass nil for directory param to get list of Documents folder
+// pass nil for directory param to get list of Documents folder,
+// pass @"" for the indent
 //----------------------------------------------------------------------
-void listFiles(NSString* directory);
+void listFiles(NSString* directory, NSString* indent);
 
 //----------------------------------------------------------------------
 // returns YES if the URL is a file scheme URL and the path to the
