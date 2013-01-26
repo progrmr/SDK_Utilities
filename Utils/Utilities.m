@@ -408,25 +408,25 @@ NSString* documentsPath()
 //----------------------------------------------------------------------
 // prints list of files w/NSLog
 // pass nil for directory param to get list of Documents folder
+// pass @"" for the indent
 //----------------------------------------------------------------------
-void listFiles(NSString* directory)
+void listFiles(NSString* directory, NSString* indent)
 {
 	NSFileManager* fileMgr = [NSFileManager defaultManager];
-
+    
 	if (directory == nil) {
 		directory = documentsPath();
 	}
     
     [fileMgr changeCurrentDirectoryPath:directory];
-
+    
     NSArray* filenames = [fileMgr contentsOfDirectoryAtPath:directory error:NULL];
 	NSDateFormatter* dateFmtr = [NSDateFormatter new];
 	[dateFmtr setDateFormat:@"yyyy-MM-dd HH:mm"];
 	
-	NSLog(@"%u files in %@", (unsigned)[filenames count], directory);
-	
-    for (NSString* filename in filenames){
-        
+	NSLog(@"%@%@", indent, directory);
+    
+    for (NSString* filename in filenames) {
 		NSDictionary* dict = [fileMgr attributesOfItemAtPath:filename error:NULL];
         NSString* fileType = [dict objectForKey:NSFileType];
 		NSUInteger perms  = [dict filePosixPermissions];
@@ -435,13 +435,20 @@ void listFiles(NSString* directory)
 		uint64_t size   = [dict fileSize];
 		NSDate* date    = [dict fileModificationDate];
 		
-        NSLog(@"File: %c %03u %@ %@ %6qu %@ %@", 
-              fileType == NSFileTypeDirectory ? 'd' : ' ',
+        NSLog(@"%@  %c %03o %@ %@ %6qu %@ %@", indent,
+              fileType == NSFileTypeDirectory ? 'd' : '-',
 			  (unsigned)perms, owner, group, size, [dateFmtr stringFromDate:date], filename);
+    }
+    
+    NSLog(@"  ");
+    
+    for (NSString* filename in filenames) {
+		NSDictionary* dict = [fileMgr attributesOfItemAtPath:filename error:NULL];
+        NSString* fileType = [dict objectForKey:NSFileType];
         
         if (fileType == NSFileTypeDirectory) {
             NSString* subdir = [directory stringByAppendingPathComponent:filename];
-            listFiles(subdir);
+            listFiles(subdir, [indent stringByAppendingString:@"  "]);
             
             // change back to current directory
             [fileMgr changeCurrentDirectoryPath:directory];
