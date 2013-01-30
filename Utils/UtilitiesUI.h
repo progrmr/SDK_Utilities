@@ -23,10 +23,6 @@
 #import <UIKit/UIKit.h>
 #import <QuartzCore/QuartzCore.h>
 
-@interface UtilitiesUI {
-	
-}
-
 #define newUICOLOR(r,g,b,a) ([[UIColor alloc] initWithRed:(r/255.0f) green:(g/255.0f) blue:(b/255.0f) alpha:(a/255.0f)])
 
 
@@ -150,5 +146,3 @@ void dumpWindows();
 void dumpView(UIView* aView, NSString* indent, BOOL showLayers);
 void dumpLayer(CALayer* aLayer, NSString* indent);
 #endif
-
-@end

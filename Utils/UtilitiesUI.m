@@ -24,8 +24,6 @@
 #import "UIColor-Expanded.h"
 #import "UIColor-HSVAdditions.h"
 
-@implementation UtilitiesUI
-
 //-----------------------------------------------------------------------------
 // addConvexHighlightToLayer - creates a new layer and adds it to the given layer
 //		this highlight brightens the top half, darkens the bottom half to
@@ -441,8 +439,6 @@ void tellParentToDismissModalVC(UIViewController* viewController)
         [[viewController parentViewController] dismissModalViewControllerAnimated:YES];
     }
 }
-
-@end
 
 
 
