@@ -1,5 +1,5 @@
 //
-//  RBSpeech.m
+//  GMSpeech.m
 //  RB2
 //
 //  Created by Gary Morris on 2/18/13.
@@ -7,9 +7,9 @@
 //
 //  Modified to work with both OSX and iOS 7.0+
 //
-#import "RBSpeech.h"
+#import "GMSpeech.h"
 
-// speech synthesis required MacOSX or iOS >= 7
+// speech synthesis requires MacOSX or iOS >= 7
 #if (__IPHONE_OS_VERSION_MAX_ALLOWED >= 70000) || (!TARGET_OS_IPHONE)
 
 #if TARGET_OS_IPHONE
@@ -17,33 +17,33 @@
 #define NSSpeechSynthesizerDelegate AVSpeechSynthesizerDelegate
 #define NSSpeechSynthesizer         AVSpeechSynthesizer
 
-#else
-// MacOSX 
+#else   /* MAC OSX */
+// MacOSX allows choosing a voice
 #define VOICE @"com.apple.speech.synthesis.voice.Alex"
 #endif
 
-@interface RBSpeech() <NSSpeechSynthesizerDelegate>
+@interface GMSpeech() <NSSpeechSynthesizerDelegate>
 
 @property (atomic, strong)    NSMutableArray*           speechQueue;    // things waiting to be said
 @property (nonatomic, strong) NSSpeechSynthesizer*      speech;         // speech synthesizer
 
 #if TARGET_OS_IPHONE
-@property (nonatomic, strong) AVSpeechSynthesisVoice*   voice;
+@property (nonatomic, strong) AVSpeechSynthesisVoice*   voice;          // used with iOS
 #endif
 
 @end
 
 
-@implementation RBSpeech
+@implementation GMSpeech
 
 @synthesize speech = _speech;
 
-+ (RBSpeech*)speaker
++ (GMSpeech*)speaker
 {
-    static RBSpeech* speaker = nil;
+    static GMSpeech* speaker = nil;
     
     if (speaker == nil) {
-        speaker = [[RBSpeech alloc] init];
+        speaker = [[GMSpeech alloc] init];
     }
     return speaker;
 }
@@ -66,26 +66,26 @@
 #if TARGET_OS_IPHONE
         // get a voice for the default language
         _voice = [AVSpeechSynthesisVoice voiceWithLanguage:nil];
-
         _speech = [[AVSpeechSynthesizer alloc] init];
-#else
-        NSString* voice = nil;
 
+#else   /* MAC OSX */
+        NSString* voice = nil;
+        // find the VOICE
         for (NSString* aVoice in [NSSpeechSynthesizer availableVoices]) {
-            if ([aVoice isEqualToString:RB_VOICE]) {
+            if ([aVoice isEqualToString:VOICE]) {
                 voice = aVoice;
                 break;
             }
         }
         _speech = [[NSSpeechSynthesizer alloc] initWithVoice:voice];
-#endif
+#endif  /* TARGET_OS_IPHONE */
         _speech.delegate = self;
     }
     return _speech;
 }
 
 #pragma mark -
-#pragma mark speaking
+#pragma mark queues a string for speaking
 - (void)speakString:(NSString*)string
 {
     // add this string to the queue
@@ -104,14 +104,15 @@
 
         // speak it now
 #if TARGET_OS_IPHONE
+        // on iOS we must convert the text to an utterance
         AVSpeechUtterance* utterance = [AVSpeechUtterance speechUtteranceWithString:nextSpeech];
         utterance.voice = self.voice;
         utterance.rate  = 0.25f;      // range 0.0f - 1.0f
-
         [self.speech speakUtterance:utterance];
-#else
+        
+#else   /* MAC OSX */
         [self.speech startSpeakingString:nextSpeech];
-#endif
+#endif  /* TARGET_OS_IPHONE */
     }
 }
 
@@ -139,7 +140,7 @@ willSpeakRangeOfSpeechString:(NSRange)characterRange
     DLog(@"");
 }
 
-#else
+#else   /* MAC OSX */
 #pragma mark -
 #pragma mark NSSpeechSynthesizerDelegate methods
 - (void)speechSynthesizer:(NSSpeechSynthesizer*)speech
@@ -172,13 +173,13 @@ willSpeakRangeOfSpeechString:(NSRange)characterRange
 
     DLog(@"%@", word);
 }
-#endif
+#endif  /* TARGET_OS_IPHONE */
 
 #else 
 // no speech synthesis available
-@implementation RBSpeech
+@implementation GMSpeech
 
-+ (RBSpeech*)speaker
++ (GMSpeech*)speaker
 {
     // this was intentionally left empty
     return nil;
