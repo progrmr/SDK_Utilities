@@ -103,6 +103,8 @@
         [self.speechQueue removeObjectAtIndex:0];
 
         // speak it now
+        DLog(@"speak: \"%@\"", nextSpeech);
+
 #if TARGET_OS_IPHONE
         // on iOS we must convert the text to an utterance
         AVSpeechUtterance* utterance = [AVSpeechUtterance speechUtteranceWithString:nextSpeech];
@@ -122,13 +124,14 @@
 - (void)speechSynthesizer:(AVSpeechSynthesizer *)synthesizer
   didStartSpeechUtterance:(AVSpeechUtterance *)utterance
 {
-    DLog(@"");
+    ///DLog(@"");
 }
 
 - (void)speechSynthesizer:(AVSpeechSynthesizer *)synthesizer
  didFinishSpeechUtterance:(AVSpeechUtterance *)utterance
 {
-    DLog(@"");
+    ///DLog(@"");
+
     // speak next phrase in the queue after a slight pause
     [self performSelector:@selector(speakNext) withObject:nil afterDelay:0.25];
 }
@@ -137,7 +140,7 @@
 willSpeakRangeOfSpeechString:(NSRange)characterRange
                 utterance:(AVSpeechUtterance *)utterance
 {
-    DLog(@"");
+    ///DLog(@"");
 }
 
 #else   /* MAC OSX */
@@ -146,7 +149,6 @@ willSpeakRangeOfSpeechString:(NSRange)characterRange
 - (void)speechSynthesizer:(NSSpeechSynthesizer*)speech
         didFinishSpeaking:(BOOL)finishedSpeaking
 {
-    DLog(@"");
     // speak next phrase in the queue after a slight pause
     [self performSelector:@selector(speakNext) withObject:nil afterDelay:0.25];
 }
@@ -169,9 +171,8 @@ willSpeakRangeOfSpeechString:(NSRange)characterRange
             willSpeakWord:(NSRange)characterRange
                  ofString:(NSString*)string
 {
-    NSString* word = [string substringWithRange:characterRange];
-
-    DLog(@"%@", word);
+    ///NSString* word = [string substringWithRange:characterRange];
+    ///DLog(@"%@", word);
 }
 #endif  /* TARGET_OS_IPHONE */
 
