@@ -1,12 +1,9 @@
 //
 // From: http://stackoverflow.com/a/234099/1693173
 //
-
+#import <Foundation/Foundation.h>
 #import "NSData+Compression.h"
 #include <zlib.h>
-#include <openssl/md5.h>
-#include <openssl/sha.h>
-#include <openssl/ripemd.h>
 
 
 @implementation NSData (NSDataExtension)
@@ -140,9 +137,12 @@
         ,'2','3','4','5','6','7'                             // 26..31
     };
     const Byte *bytes = [self bytes];
-    int bytesOffset = 0, bytesLen = [self length];
-    int charsOffset = 0, charsLen = ((bytesLen << 3) + 4) / 5;
+    int bytesOffset = 0;
+    int bytesLen    = [self length];
+    int charsOffset = 0;
+    int charsLen    = ((bytesLen << 3) + 4) / 5;
     char chars[charsLen];
+
     while (bytesLen != 0) {
         int digit, lastDigit;
         // INVARIANTS FOR EACH STEP n in [0..5[; digit in [0..31[;
@@ -191,7 +191,7 @@
         charsOffset += 8;
         bytesLen -= 5;
     }
-    return [NSString stringWithCString:chars length:sizeof(chars)];
+    return [[NSString alloc] initWithBytes:chars length:sizeof(chars) encoding:NSASCIIStringEncoding];
 }
 
 #define FinishBlock(X) \
@@ -534,63 +534,6 @@ static const unsigned long crc32table[] =
     }
 
     return crcval ^ 0xffffffff;
-}
-
-// Hash function, by [[DamienBob]]
-
-#define HEComputeDigest(method)                     \
-method##_CTX ctx;                               \
-unsigned char digest[method##_DIGEST_LENGTH];       \
-method##_Init(&ctx);                            \
-method##_Update(&ctx, [self bytes], [self length]);     \
-method##_Final(digest, &ctx);
-
-#define HEComputeDigestNSData(method)               \
-HEComputeDigest(method)                     \
-return [NSData dataWithBytes:digest length:method##_DIGEST_LENGTH];
-
-#define HEComputeDigestNSString(method)             \
-static char __HEHexDigits[] = "0123456789abcdef";       \
-unsigned char digestString[2*method##_DIGEST_LENGTH];\
-unsigned int i;                                 \
-HEComputeDigest(method)                     \
-for(i=0; i<method##_DIGEST_LENGTH; i++) {               \
-digestString[2*i]   = __HEHexDigits[digest[i] >> 4];    \
-digestString[2*i+1] = __HEHexDigits[digest[i] & 0x0f];\
-}                                           \
-return [NSString stringWithCString:(char *)digestString length:2*method##_DIGEST_LENGTH];
-
-#define SHA1_CTX                SHA_CTX
-#define SHA1_DIGEST_LENGTH      SHA_DIGEST_LENGTH
-
-- (NSData*) md5Digest
-{
-    HEComputeDigestNSData(MD5);
-}
-
-- (NSString*) md5DigestString
-{
-    HEComputeDigestNSString(MD5);
-}
-
-- (NSData*) sha1Digest
-{
-    HEComputeDigestNSData(SHA1);
-}
-
-- (NSString*) sha1DigestString
-{
-    HEComputeDigestNSString(SHA1);
-}
-
-- (NSData*) ripemd160Digest
-{
-    HEComputeDigestNSData(RIPEMD160);
-}
-
-- (NSString*) ripemd160DigestString
-{
-    HEComputeDigestNSString(RIPEMD160);
 }
 
 @end

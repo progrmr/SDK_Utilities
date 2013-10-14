@@ -26,12 +26,4 @@
 //CRC32
 - (unsigned int)crc32;
 
-// Hash
-- (NSData*)   md5Digest;
-- (NSString*) md5DigestString;
-- (NSData*)   sha1Digest;
-- (NSString*) sha1DigestString;
-- (NSData*)   ripemd160Digest;
-- (NSString*) ripemd160DigestString;
-
 @end
