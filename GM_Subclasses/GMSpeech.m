@@ -127,8 +127,6 @@
         qEntry.string     = string;
         qEntry.completion = completion;
 
-        DLog(@"ENQUEUE: %@", qEntry.string);
-
         [self.speechQueue addObject:qEntry];
 
         // speak next string in the queue
@@ -149,9 +147,6 @@
         GMSpeechEntry* nextEntry = self.speechQueue[0];
         [self.speechQueue removeObjectAtIndex:0];
 
-        // speak it now
-        DLog(@"SPEAK: \"%@\"", nextEntry.string);
-
         // if this is the same as the last speech text, drop it
         const CFAbsoluteTime now = CFAbsoluteTimeGetCurrent();
         const CFAbsoluteTime elapsed = now - self.lastSpokenTime;
@@ -168,10 +163,11 @@
             return;
         }
 
-        // save lastSpoken text and lastSpokenTime
-        self.lastSpoken     = nextEntry.string;
-        self.lastSpokenTime = now;
-        self.currentSpeech  = nextEntry;
+        // speak it now
+        DLog(@"SPEAK: \"%@\"", nextEntry.string);
+
+        // starting to speak this entry
+        self.currentSpeech = nextEntry;
 
 #if TARGET_OS_IPHONE
         // on iOS we must convert the text to an utterance
@@ -192,11 +188,16 @@
 - (void)speechSynthesizer:(AVSpeechSynthesizer *)synthesizer
  didFinishSpeechUtterance:(AVSpeechUtterance *)utterance
 {
-    ///DLog(@"");
-    if (self.currentSpeech.completion) {
-        self.currentSpeech.completion(YES);     // speech finished
+    // save lastSpoken text and lastSpokenTime
+    self.lastSpoken     = self.currentSpeech.string;
+    self.lastSpokenTime = CFAbsoluteTimeGetCurrent();
+
+    GMSpeechEntry* current = self.currentSpeech;
+    self.currentSpeech = nil;       // clear currentSpeech (completion block may set it)
+
+    if (current.completion) {
+        current.completion(YES);     // speech finished
     }
-    self.currentSpeech = nil;
 
     // speak next phrase in the queue after a slight pause
     [self performSelector:@selector(speakNext) withObject:nil afterDelay:0.25];
@@ -208,11 +209,17 @@
 - (void)speechSynthesizer:(NSSpeechSynthesizer*)speech
         didFinishSpeaking:(BOOL)finishedSpeaking
 {
-    if (self.currentSpeech.completion) {
-        self.currentSpeech.completion(YES);     // speech finished
-    }
-    self.currentSpeech = nil;
+    // save lastSpoken text and lastSpokenTime
+    self.lastSpoken     = self.currentSpeech.string;
+    self.lastSpokenTime = CFAbsoluteTimeGetCurrent();
 
+    GMSpeechEntry* current = self.currentSpeech;
+    self.currentSpeech = nil;       // clear currentSpeech (completion block may set it)
+
+    if (current.completion) {
+        current.completion(YES);     // speech finished
+    }
+    
     // speak next phrase in the queue after a slight pause
     [self performSelector:@selector(speakNext) withObject:nil afterDelay:0.25];
 }
@@ -227,7 +234,7 @@
     }
     self.currentSpeech = nil;
 
-    DLog(@"ERROR: %@ =================================", message);
+    DLog(@"ERROR: %@", message);
 }
 
 - (void)speechSynthesizer:(NSSpeechSynthesizer*)speech
