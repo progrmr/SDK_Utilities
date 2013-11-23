@@ -23,8 +23,18 @@
 
 @interface GMSpeech : NSObject
 
+// if the same string is sent to speakString again within dropDuplicatesTime,
+// then the string will not be spoken (it only checks against one previous),
+// default is 20 seconds
+@property (nonatomic, assign) NSTimeInterval dropDuplicatesTime;
+
 + (GMSpeech*)speaker;               // returns singleton instance
 
 - (void)speakString:(NSString*)string;      // speaks a string
+
+// completion will be called with finished==YES after the string has been spoken.
+// finished will be NO if the string is not spoken, either from an error or
+// if it was a duplicate of the last speech (within dropDuplicatesTime)
+- (void)speakString:(NSString*)string withCompletion:(void (^)(BOOL finished))completion;
 
 @end

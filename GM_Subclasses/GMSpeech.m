@@ -35,10 +35,25 @@
 #define VOICE @"com.apple.speech.synthesis.voice.Alex"
 #endif
 
+
+// GMSpeechEntry is a object that holds text to be spoken and a completion block
+@interface GMSpeechEntry : NSObject
+@property (nonatomic, copy)   NSString* string;
+@property (nonatomic, strong) void (^completion)(BOOL finished);
+@end
+@implementation GMSpeechEntry
+@end
+
+
 @interface GMSpeech() <NSSpeechSynthesizerDelegate>
 
-@property (atomic, strong)    NSMutableArray*           speechQueue;    // things waiting to be said
+// speechQueue is a FIFO queue of GMSpeechEntry objects waiting to be spoken
+@property (atomic, strong)    NSMutableArray*           speechQueue;    // queue waiting to be said
+
 @property (nonatomic, strong) NSSpeechSynthesizer*      speech;         // speech synthesizer
+@property (nonatomic, strong) NSString*                 lastSpoken;     // last spoken string
+@property (nonatomic, assign) CFAbsoluteTime            lastSpokenTime; // time lastSpoken was spoken
+@property (nonatomic, strong) GMSpeechEntry*            currentSpeech;  // currently being spoken
 
 #if TARGET_OS_IPHONE
 @property (nonatomic, strong) AVSpeechSynthesisVoice*   voice;          // used with iOS
@@ -65,8 +80,8 @@
 {
     self = [super init];
     if (self) {
-        _speechQueue = [NSMutableArray arrayWithCapacity:4];
-
+        _speechQueue = [NSMutableArray arrayWithCapacity:8];
+        _dropDuplicatesTime = 20;
     }
     return self;
 }
@@ -78,7 +93,7 @@
     if (_speech == nil) {
 #if TARGET_OS_IPHONE
         // get a voice for the default language
-        _voice = [AVSpeechSynthesisVoice voiceWithLanguage:nil];
+        _voice  = [AVSpeechSynthesisVoice voiceWithLanguage:nil];
         _speech = [[AVSpeechSynthesizer alloc] init];
 
 #else   /* MAC OSX */
@@ -101,32 +116,72 @@
 #pragma mark queues a string for speaking
 - (void)speakString:(NSString*)string
 {
-    // add this string to the queue
-    [self.speechQueue addObject:string];
+    [self speakString:string withCompletion:nil];
+}
 
-    // speak next string in the queue
-    [self speakNext];
+- (void)speakString:(NSString*)string withCompletion:(void (^)(BOOL finished))completion
+{
+    if (string.length > 0) {
+        // add this string to the queue
+        GMSpeechEntry* qEntry = [[GMSpeechEntry alloc] init];
+        qEntry.string     = string;
+        qEntry.completion = completion;
+
+        DLog(@"ENQUEUE: %@", qEntry.string);
+
+        [self.speechQueue addObject:qEntry];
+
+        // speak next string in the queue
+        [self speakNext];
+
+    } else {
+        // call completion block now
+        if (completion) {
+            completion(NO); // no because string was 0 length
+        }
+    }
 }
 
 - (void)speakNext
 {
     if (self.speechQueue.count && !self.speech.isSpeaking) {
-        // speak the queued text
-        NSString* nextSpeech = [self.speechQueue objectAtIndex:0];
+        // dequeue the next speech entry
+        GMSpeechEntry* nextEntry = self.speechQueue[0];
         [self.speechQueue removeObjectAtIndex:0];
 
         // speak it now
-        DLog(@"speak: \"%@\"", nextSpeech);
+        DLog(@"SPEAK: \"%@\"", nextEntry.string);
+
+        // if this is the same as the last speech text, drop it
+        const CFAbsoluteTime now = CFAbsoluteTimeGetCurrent();
+        const CFAbsoluteTime elapsed = now - self.lastSpokenTime;
+
+        if ((elapsed <= self.dropDuplicatesTime) && ([nextEntry.string caseInsensitiveCompare:self.lastSpoken] == NSOrderedSame)) {
+            DLog(@"DUPLICATE: spoke it %0.1f secs ago", elapsed);
+            // call completion block
+            if (nextEntry.completion) {
+                nextEntry.completion(NO);   // duplicate, not spoken
+            }
+
+            // speak the next entry in the queue
+            [self performSelector:@selector(speakNext) withObject:nil afterDelay:0];
+            return;
+        }
+
+        // save lastSpoken text and lastSpokenTime
+        self.lastSpoken     = nextEntry.string;
+        self.lastSpokenTime = now;
+        self.currentSpeech  = nextEntry;
 
 #if TARGET_OS_IPHONE
         // on iOS we must convert the text to an utterance
-        AVSpeechUtterance* utterance = [AVSpeechUtterance speechUtteranceWithString:nextSpeech];
+        AVSpeechUtterance* utterance = [AVSpeechUtterance speechUtteranceWithString:nextEntry.string];
         utterance.voice = self.voice;
         utterance.rate  = 0.25f;      // range 0.0f - 1.0f
         [self.speech speakUtterance:utterance];
         
 #else   /* MAC OSX */
-        [self.speech startSpeakingString:nextSpeech];
+        [self.speech startSpeakingString:nextEntry.string];
 #endif  /* TARGET_OS_IPHONE */
     }
 }
@@ -135,25 +190,16 @@
 #pragma mark -
 #pragma mark AVSpeechSynthesizerDelegate methods
 - (void)speechSynthesizer:(AVSpeechSynthesizer *)synthesizer
-  didStartSpeechUtterance:(AVSpeechUtterance *)utterance
-{
-    ///DLog(@"");
-}
-
-- (void)speechSynthesizer:(AVSpeechSynthesizer *)synthesizer
  didFinishSpeechUtterance:(AVSpeechUtterance *)utterance
 {
     ///DLog(@"");
+    if (self.currentSpeech.completion) {
+        self.currentSpeech.completion(YES);     // speech finished
+    }
+    self.currentSpeech = nil;
 
     // speak next phrase in the queue after a slight pause
     [self performSelector:@selector(speakNext) withObject:nil afterDelay:0.25];
-}
-
-- (void)speechSynthesizer:(AVSpeechSynthesizer *)synthesizer
-willSpeakRangeOfSpeechString:(NSRange)characterRange
-                utterance:(AVSpeechUtterance *)utterance
-{
-    ///DLog(@"");
 }
 
 #else   /* MAC OSX */
@@ -162,6 +208,11 @@ willSpeakRangeOfSpeechString:(NSRange)characterRange
 - (void)speechSynthesizer:(NSSpeechSynthesizer*)speech
         didFinishSpeaking:(BOOL)finishedSpeaking
 {
+    if (self.currentSpeech.completion) {
+        self.currentSpeech.completion(YES);     // speech finished
+    }
+    self.currentSpeech = nil;
+
     // speak next phrase in the queue after a slight pause
     [self performSelector:@selector(speakNext) withObject:nil afterDelay:0.25];
 }
@@ -171,7 +222,12 @@ willSpeakRangeOfSpeechString:(NSRange)characterRange
                  ofString:(NSString*)string
                   message:(NSString*)message
 {
-    DLog(@"ERROR: %@", message);
+    if (self.currentSpeech.completion) {
+        self.currentSpeech.completion(NO);     // speech failed
+    }
+    self.currentSpeech = nil;
+
+    DLog(@"ERROR: %@ =================================", message);
 }
 
 - (void)speechSynthesizer:(NSSpeechSynthesizer*)speech
@@ -179,18 +235,10 @@ willSpeakRangeOfSpeechString:(NSRange)characterRange
 {
     DLog(@"SYNC: %@", message);
 }
-
-- (void)speechSynthesizer:(NSSpeechSynthesizer*)speech
-            willSpeakWord:(NSRange)characterRange
-                 ofString:(NSString*)string
-{
-    ///NSString* word = [string substringWithRange:characterRange];
-    ///DLog(@"%@", word);
-}
 #endif  /* TARGET_OS_IPHONE */
 
 #else 
-// no speech synthesis available
+// no speech synthesis available before iOS 7
 @implementation GMSpeech
 
 + (GMSpeech*)speaker
@@ -203,6 +251,12 @@ willSpeakRangeOfSpeechString:(NSRange)characterRange
 {
     // this was intentionally left empty
 }
+
+- (void)speakString:(NSString*)string withCompletion:(void (^)(BOOL finished))completion
+{
+    // this was intentionally left empty
+}
+
 #endif
 
 @end
