@@ -22,9 +22,6 @@
 //
 #import "GMSpeech.h"
 
-// speech synthesis requires MacOSX or iOS >= 7
-#if (__IPHONE_OS_VERSION_MAX_ALLOWED >= 70000) || (!TARGET_OS_IPHONE)
-
 #if TARGET_OS_IPHONE
 #import <AVFoundation/AVFoundation.h>
 #define NSSpeechSynthesizerDelegate AVSpeechSynthesizerDelegate
@@ -182,30 +179,17 @@
     }
 }
 
-#if TARGET_OS_IPHONE
 #pragma mark -
-#pragma mark AVSpeechSynthesizerDelegate methods
+#pragma mark NS/AVSpeechSynthesizerDelegate methods
+// AVSpeechSynthesizerDelegate methods (iOS)
 - (void)speechSynthesizer:(AVSpeechSynthesizer *)synthesizer
  didFinishSpeechUtterance:(AVSpeechUtterance *)utterance
 {
-    // save lastSpoken text and lastSpokenTime
-    self.lastSpoken     = self.currentSpeech.string;
-    self.lastSpokenTime = CFAbsoluteTimeGetCurrent();
-
-    GMSpeechEntry* current = self.currentSpeech;
-    self.currentSpeech = nil;       // clear currentSpeech (completion block may set it)
-
-    if (current.completion) {
-        current.completion(YES);     // speech finished
-    }
-
-    // speak next phrase in the queue after a slight pause
-    [self performSelector:@selector(speakNext) withObject:nil afterDelay:0.25];
+    // call the OSX delegate method to avoid duplication
+    [self speechSynthesizer:synthesizer didFinishSpeaking:YES];
 }
 
-#else   /* MAC OSX */
-#pragma mark -
-#pragma mark NSSpeechSynthesizerDelegate methods
+// NSSpeechSynthesizerDelegate methods (OSX)
 - (void)speechSynthesizer:(NSSpeechSynthesizer*)speech
         didFinishSpeaking:(BOOL)finishedSpeaking
 {
@@ -217,13 +201,14 @@
     self.currentSpeech = nil;       // clear currentSpeech (completion block may set it)
 
     if (current.completion) {
-        current.completion(YES);     // speech finished
+        current.completion(finishedSpeaking);     // speech finished
     }
     
     // speak next phrase in the queue after a slight pause
     [self performSelector:@selector(speakNext) withObject:nil afterDelay:0.25];
 }
 
+// NSSpeechSynthesizerDelegate methods (OSX)
 - (void)speechSynthesizer:(NSSpeechSynthesizer*)speech
  didEncounterErrorAtIndex:(NSUInteger)characterIndex
                  ofString:(NSString*)string
@@ -237,33 +222,11 @@
     DLog(@"ERROR: %@", message);
 }
 
+// NSSpeechSynthesizerDelegate methods (OSX)
 - (void)speechSynthesizer:(NSSpeechSynthesizer*)speech
   didEncounterSyncMessage:(NSString*)message
 {
     DLog(@"SYNC: %@", message);
 }
-#endif  /* TARGET_OS_IPHONE */
-
-#else 
-// no speech synthesis available before iOS 7
-@implementation GMSpeech
-
-+ (GMSpeech*)speaker
-{
-    // this was intentionally left empty
-    return nil;
-}
-
-- (void)speakString:(NSString*)string
-{
-    // this was intentionally left empty
-}
-
-- (void)speakString:(NSString*)string withCompletion:(void (^)(BOOL finished))completion
-{
-    // this was intentionally left empty
-}
-
-#endif
 
 @end
