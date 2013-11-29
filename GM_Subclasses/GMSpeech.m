@@ -124,7 +124,9 @@
         qEntry.string     = string;
         qEntry.completion = completion;
 
-        [self.speechQueue addObject:qEntry];
+        @synchronized (self.speechQueue) {
+            [self.speechQueue addObject:qEntry];
+        }
 
         // speak next string in the queue
         [self speakNext];
@@ -139,43 +141,65 @@
 
 - (void)speakNext
 {
-    if (self.speechQueue.count && !self.speech.isSpeaking) {
+    // if speech in progress or nothing to say, return now
+    if (self.currentSpeech || self.speechQueue.count == 0) return;
+
+    GMSpeechEntry* nextEntry = nil;
+
+    @synchronized(self.speechQueue) {
         // dequeue the next speech entry
-        GMSpeechEntry* nextEntry = self.speechQueue[0];
+        nextEntry = self.speechQueue[0];
         [self.speechQueue removeObjectAtIndex:0];
+    }
 
-        // if this is the same as the last speech text, drop it
-        const CFAbsoluteTime now = CFAbsoluteTimeGetCurrent();
-        const CFAbsoluteTime elapsed = now - self.lastSpokenTime;
+    // if this is the same as the last speech text, drop it
+    const CFAbsoluteTime now = CFAbsoluteTimeGetCurrent();
+    const CFAbsoluteTime elapsed = now - self.lastSpokenTime;
 
-        if ((elapsed <= self.dropDuplicatesTime) && ([nextEntry.string caseInsensitiveCompare:self.lastSpoken] == NSOrderedSame)) {
-            DLog(@"DUPLICATE: spoke it %0.1f secs ago", elapsed);
-            // call completion block
-            if (nextEntry.completion) {
-                nextEntry.completion(NO);   // duplicate, not spoken
-            }
-
-            // speak the next entry in the queue
-            [self performSelector:@selector(speakNext) withObject:nil afterDelay:0];
-            return;
+    if ((elapsed <= self.dropDuplicatesTime) && ([nextEntry.string caseInsensitiveCompare:self.lastSpoken] == NSOrderedSame)) {
+        DLog(@"DUPLICATE: spoke it %0.1f secs ago", elapsed);
+        // call completion block
+        if (nextEntry.completion) {
+            nextEntry.completion(NO);   // duplicate, not spoken
         }
 
-        // speak it now
-        DLog(@"SPEAK: \"%@\"", nextEntry.string);
+        // speak the next entry in the queue
+        [self performSelector:@selector(speakNext) withObject:nil afterDelay:0];
+        return;
+    }
 
-        // starting to speak this entry
-        self.currentSpeech = nextEntry;
+    // speak it now
+    DLog(@"SPEAK: \"%@\"", nextEntry.string);
+
+    // starting to speak this entry
+    self.currentSpeech = nextEntry;
 
 #if TARGET_OS_IPHONE
-        // on iOS we must convert the text to an utterance
-        AVSpeechUtterance* utterance = [AVSpeechUtterance speechUtteranceWithString:nextEntry.string];
-        utterance.voice = self.voice;
-        utterance.rate  = 0.25f;      // range 0.0f - 1.0f
-        [self.speech speakUtterance:utterance];
-        
+    // on iOS we must convert the text to an utterance
+    AVSpeechUtterance* utterance = [AVSpeechUtterance speechUtteranceWithString:nextEntry.string];
+    utterance.voice = self.voice;
+    utterance.rate  = 0.25f;      // range 0.0f - 1.0f
+    [self.speech speakUtterance:utterance];
+
 #else   /* MAC OSX */
-        [self.speech startSpeakingString:nextEntry.string];
+    [self.speech startSpeakingString:nextEntry.string];
 #endif  /* TARGET_OS_IPHONE */
+}
+
+
+// removes unspoken strings from the queue
+- (void)flushQueue
+{
+    @synchronized(self.speechQueue) {
+        for (GMSpeechEntry* qEntry in self.speechQueue) {
+            DLog(@"flushed: \"%@\"", qEntry.string);
+            
+            if (qEntry.completion) {
+                qEntry.completion(NO);  // tell them they did not get to speak
+            }
+        }
+
+        [self.speechQueue removeAllObjects];
     }
 }
 
@@ -227,6 +251,7 @@
   didEncounterSyncMessage:(NSString*)message
 {
     DLog(@"SYNC: %@", message);
+    self.currentSpeech = nil;
 }
 
 @end
