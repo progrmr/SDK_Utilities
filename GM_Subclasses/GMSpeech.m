@@ -54,6 +54,8 @@
 
 #if TARGET_OS_IPHONE
 @property (nonatomic, strong) AVSpeechSynthesisVoice*   voice;          // used with iOS
+@property (nonatomic, strong) AVAudioSession*           session;
+@property (nonatomic, assign) BOOL                      sessionActive;  // audio session is active
 #endif
 
 @end
@@ -84,14 +86,14 @@
 }
 
 #pragma mark -
-#pragma mark custom getter
+#pragma mark custom getters / setters
 - (NSSpeechSynthesizer*)speech
 {
     if (_speech == nil) {
 #if TARGET_OS_IPHONE
         // get a voice for the default language
-        _voice  = [AVSpeechSynthesisVoice voiceWithLanguage:nil];
-        _speech = [[AVSpeechSynthesizer alloc] init];
+        _voice   = [AVSpeechSynthesisVoice voiceWithLanguage:nil];
+        _speech  = [[AVSpeechSynthesizer alloc] init];
 
 #else   /* MAC OSX */
         NSString* voice = nil;
@@ -107,6 +109,37 @@
         _speech.delegate = self;
     }
     return _speech;
+}
+
+- (void)setAudioCategory:(AudioCategories)audioCategory
+{
+    if (self.session == nil) {
+        self.session = [AVAudioSession sharedInstance];
+    }
+
+    NSError* error     = nil;
+    NSString* category = nil;
+
+    if (self.sessionActive) {
+        // deactivate audio session before setting a new category
+        self.sessionActive = [self.session setActive:NO error:&error];
+    }
+
+    switch (audioCategory) {
+        case AudioCategoryNone:     category = nil;                             break;
+        case AudioCategoryAmbient:  category = AVAudioSessionCategoryAmbient;   break;
+        case AudioCategoryPlayback: category = AVAudioSessionCategoryPlayback;  break;
+    }
+
+    if (category) {
+        // activate audio session with the new category
+        [self.session setCategory:category error:&error];
+        self.sessionActive = [self.session setActive:YES error:&error];
+    }
+
+    if (error) {
+        DLog(@"ERROR: %@", error);
+    }
 }
 
 #pragma mark -
