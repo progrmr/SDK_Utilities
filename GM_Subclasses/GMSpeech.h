@@ -21,20 +21,12 @@
 
 #import <Foundation/Foundation.h>
 
-typedef enum { AudioCategoryNone, AudioCategoryAmbient, AudioCategoryPlayback } AudioCategories;
-
 @interface GMSpeech : NSObject
 
 // if the same string is sent to speakString again within dropDuplicatesTime,
 // then the string will not be spoken (it only checks against one previous),
 // default is 20 seconds
 @property (nonatomic, assign) NSTimeInterval dropDuplicatesTime;
-
-// audio session category can be set through this property.  The default is
-// AudioCategoryNone.  AudioCategoryAmbient corresponds to AVAudioSessionCategoryAmbient.
-// AudioCategoryPlayback corresponds to AVAudioSessionCatgoryPlayback.
-// (see AVAudioSession for details in setCategory:error:)
-@property (nonatomic, assign) AudioCategories audioCategory;
 
 + (GMSpeech*)speaker;               // returns singleton instance
 

@@ -38,6 +38,7 @@
 @property (nonatomic, copy)   NSString* string;
 @property (nonatomic, strong) void (^completion)(BOOL finished);
 @end
+
 @implementation GMSpeechEntry
 @end
 
@@ -54,8 +55,6 @@
 
 #if TARGET_OS_IPHONE
 @property (nonatomic, strong) AVSpeechSynthesisVoice*   voice;          // used with iOS
-@property (nonatomic, strong) AVAudioSession*           session;
-@property (nonatomic, assign) BOOL                      sessionActive;  // audio session is active
 #endif
 
 @end
@@ -109,37 +108,6 @@
         _speech.delegate = self;
     }
     return _speech;
-}
-
-- (void)setAudioCategory:(AudioCategories)audioCategory
-{
-    if (self.session == nil) {
-        self.session = [AVAudioSession sharedInstance];
-    }
-
-    NSError* error     = nil;
-    NSString* category = nil;
-
-    if (self.sessionActive) {
-        // deactivate audio session before setting a new category
-        self.sessionActive = [self.session setActive:NO error:&error];
-    }
-
-    switch (audioCategory) {
-        case AudioCategoryNone:     category = nil;                             break;
-        case AudioCategoryAmbient:  category = AVAudioSessionCategoryAmbient;   break;
-        case AudioCategoryPlayback: category = AVAudioSessionCategoryPlayback;  break;
-    }
-
-    if (category) {
-        // activate audio session with the new category
-        [self.session setCategory:category error:&error];
-        self.sessionActive = [self.session setActive:YES error:&error];
-    }
-
-    if (error) {
-        DLog(@"ERROR: %@", error);
-    }
 }
 
 #pragma mark -
