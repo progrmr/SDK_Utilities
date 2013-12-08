@@ -91,7 +91,7 @@
     if (_speech == nil) {
 #if TARGET_OS_IPHONE
         // get a voice for the default language
-        _voice   = [AVSpeechSynthesisVoice voiceWithLanguage:nil];
+        _voice   = [AVSpeechSynthesisVoice voiceWithLanguage:@"en-US"];
         _speech  = [[AVSpeechSynthesizer alloc] init];
 
 #else   /* MAC OSX */
