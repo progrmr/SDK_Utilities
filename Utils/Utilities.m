@@ -41,8 +41,8 @@
 #ifdef USE_MY_ORIGINAL_CODE
 	NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];	
 	[dateFormatter setLocale: [NSLocale currentLocale]];	
-	[dateFormatter setDateStyle:kCFDateFormatterNoStyle];
-	[dateFormatter setTimeStyle:kCFDateFormatterShortStyle];	
+	[dateFormatter setDateStyle:NSDateFormatterNoStyle];
+	[dateFormatter setTimeStyle:NSDateFormatterShortStyle];	
 	NSDate* midnight = [[NSDate alloc] initWithTimeIntervalSinceReferenceDate:0];   // get date/time (1Jan2001 0000UTC)
 	NSString* dateString = [dateFormatter stringFromDate: midnight];
 	// dateString will either be "15:00" or "16:00" (depending on DST) or
