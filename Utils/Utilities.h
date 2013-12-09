@@ -26,10 +26,12 @@
 #import <UIKit/UIKit.h>
 #endif
 
+#if !defined(DLog)
 #ifdef DEBUG
-#define DLog(fmt, ...) NSLog((@"%s " fmt), __PRETTY_FUNCTION__, ##__VA_ARGS__);
+#define DLog(fmt, ...) NSLog((@"%s " fmt), __PRETTY_FUNCTION__, ##__VA_ARGS__)
 #else
-#define DLog(...)
+#define DLog(...) do {} while(0)
+#endif
 #endif
 
 // ALog always displays output regardless of the DEBUG setting
