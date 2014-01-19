@@ -440,7 +440,20 @@ void tellParentToDismissModalVC(UIViewController* viewController)
     }
 }
 
-
+//-----------------------------------------------------------------------------
+// findSuperviewOfClass
+//-----------------------------------------------------------------------------
+UIView* superviewOfClass(Class target, UIView* fromView)
+{
+    UIView* curView = fromView.superview;
+    while (curView != nil && curView != fromView.window) {
+        if ([curView isKindOfClass:target]) {
+            return curView;
+        }
+        curView = curView.superview;
+    }
+    return nil;
+}
 
 
 

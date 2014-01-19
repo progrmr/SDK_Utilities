@@ -137,6 +137,11 @@ void setNavController(UINavigationController* newNavController);
 //-----------------------------------------------------------------------------
 void tellParentToDismissModalVC(UIViewController* viewController);
 
+//-----------------------------------------------------------------------------
+// findSuperviewOfClass
+//-----------------------------------------------------------------------------
+UIView* superviewOfClass(Class target, UIView* fromView);
+
 #ifdef DEBUG
 //-----------------------------------------------------------------------------
 // dumpWindows - prints the windows and their subview hierarchy in console log
