@@ -436,7 +436,7 @@ void tellParentToDismissModalVC(UIViewController* viewController)
         [presenter dismissViewControllerAnimated:YES completion: ^{ /* cleanup */ }];
         
     } else {
-        [[viewController parentViewController] dismissModalViewControllerAnimated:YES];
+        [[viewController parentViewController] dismissViewControllerAnimated:YES completion:nil];
     }
 }
 
