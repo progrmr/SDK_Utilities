@@ -191,8 +191,10 @@
 
 
 // removes unspoken strings from the queue
-- (void)flushQueue
+- (BOOL)flushQueue
 {
+    BOOL wasSpeaking = NO;
+    
     // stop speaking the current phrase being spoken and
     // tell its completion block it was not completed
     @synchronized(self.currentSpeech) {
@@ -201,6 +203,7 @@
 
             GMSpeechEntry* entry = self.currentSpeech;
             self.currentSpeech = nil;
+            wasSpeaking = YES;
             DLog(@"aborted: \"%@\"", entry.string);
 
             if (entry.completion) {
@@ -213,6 +216,7 @@
     // completion blocks they were not completed
     @synchronized(self.speechQueue) {
         for (GMSpeechEntry* qEntry in self.speechQueue) {
+            wasSpeaking = YES;
             DLog(@"flushed: \"%@\"", qEntry.string);
             
             if (qEntry.completion) {
@@ -222,6 +226,8 @@
 
         [self.speechQueue removeAllObjects];
     }
+    
+    return wasSpeaking;
 }
 
 #pragma mark -

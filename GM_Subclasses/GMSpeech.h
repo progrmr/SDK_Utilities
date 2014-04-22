@@ -37,7 +37,7 @@
 // if it was a duplicate of the last speech (within dropDuplicatesTime)
 - (void)speakString:(NSString*)string withCompletion:(void (^)(BOOL finished))completion;
 
-// removes unspoken strings from the queue
-- (void)flushQueue;
+// removes unspoken strings from the queue, returns YES if something was dequeued
+- (BOOL)flushQueue;
 
 @end
