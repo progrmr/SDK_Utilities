@@ -125,7 +125,7 @@ typedef uint16_t MinuteOfTheDay;		// time of day in minutes from midnight
 // returns the string unchanged if no padding needed, otherwise
 // it returns an autoreleased string.
 //-----------------------------------------------------------------------------
-+(NSString*)centerStringWithPadding:(NSString*)str Length:(int)len;
++(NSString*)centerStringWithPadding:(NSString*)str Length:(NSUInteger)len;
 
 #if TARGET_OS_IPHONE
 //-----------------------------------------------------------------------------

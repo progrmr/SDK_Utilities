@@ -27,7 +27,7 @@
 #import "mach/mach.h"
 
 #ifdef FLURRYAPI
-#import "FlurryAnalytics.h"
+#import "Flurry.h"
 #endif
 
 @implementation Utilities
@@ -233,7 +233,7 @@
 // returns the string unchanged if no padding needed, otherwise
 // it returns an autoreleased string.
 //-----------------------------------------------------------------------------
-+(NSString*)centerStringWithPadding:(NSString*)str Length:(int)len
++(NSString*)centerStringWithPadding:(NSString*)str Length:(NSUInteger)len
 {
 	if ([str length] >= len) return [NSString stringWithString:str];	// return a copy
 	
@@ -485,7 +485,7 @@ void logEvent(NSString* description)
 {
 #ifdef FLURRYAPI
 	// count/log events using the FlurryAnalytics.h
-	[FlurryAnalytics logEvent:description];
+	[Flurry logEvent:description];
 #else
 	NSLog(@"logEvent: %@", description);
 #endif		
@@ -502,7 +502,7 @@ void logError(NSString* error, NSString* format, ...)
     
 #ifdef FLURRYAPI
 	// count/log events using the FlurryAnalytics.h
-	[FlurryAnalytics logError:error message:message exception:NULL];
+	[Flurry logError:error message:message exception:NULL];
 #endif		
 	NSLog(@"ERROR: %@ %@", error, message);
     
@@ -520,7 +520,7 @@ void logException(NSException* exc, NSString* format, ...)
     
 #ifdef FLURRYAPI
 	// count/log events using the FlurryAnalytics.h
-	[FlurryAnalytics logError:@"exception" message:message exception:exc];
+	[Flurry logError:@"exception" message:message exception:exc];
 #endif		
 	NSLog(@"ERROR: %@, %@, %@", exc.name, exc.reason, message);
     

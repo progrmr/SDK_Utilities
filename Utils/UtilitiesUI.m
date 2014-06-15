@@ -227,7 +227,7 @@ CGPoint computeNewOrigin(CGSize  targetFrameSize,
 	//--------------------------------------------------------
 	// Position the item vertically in the view relativeToTop
 	//--------------------------------------------------------
-	newOrigin.y = round(targetFrameSize.height * relativeToTop - itemFrameSize.height / 2);
+	newOrigin.y = roundf(targetFrameSize.height * relativeToTop - itemFrameSize.height / 2.0f);
 	
 	if (newOrigin.y+itemFrameSize.height > targetFrameSize.height) {
 		// too far down, it will be off the bottom edge
@@ -238,7 +238,7 @@ CGPoint computeNewOrigin(CGSize  targetFrameSize,
 	}
 	
 	// Position the item horizontally in the view relativeToLeft
-	newOrigin.x = round(targetFrameSize.width * relativeToLeft - itemFrameSize.width / 2);
+	newOrigin.x = roundf(targetFrameSize.width * relativeToLeft - itemFrameSize.width / 2.0f);
 	
 	if (newOrigin.x+itemFrameSize.width > targetFrameSize.width) {
 		// too far right, it will be off the right edge
