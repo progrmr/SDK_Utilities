@@ -483,7 +483,7 @@ BOOL isFileInDocuments(NSURL* fileURL)
 //----------------------------------------------------------------------
 void logEvent(NSString* description) 
 {
-#ifdef FLURRYAPI
+#if defined(FLURRYAPI) && !(TARGET_IPHONE_SIMULATOR)
 	// count/log events using the FlurryAnalytics.h
 	[Flurry logEvent:description];
 #else
@@ -500,7 +500,7 @@ void logError(NSString* error, NSString* format, ...)
     
     va_end (args);
     
-#ifdef FLURRYAPI
+#if defined(FLURRYAPI) && !(TARGET_IPHONE_SIMULATOR)
 	// count/log events using the FlurryAnalytics.h
 	[Flurry logError:error message:message exception:NULL];
 #endif		
@@ -518,7 +518,7 @@ void logException(NSException* exc, NSString* format, ...)
     
     va_end (args);
     
-#ifdef FLURRYAPI
+#if defined(FLURRYAPI) && !(TARGET_IPHONE_SIMULATOR)
 	// count/log events using the FlurryAnalytics.h
 	[Flurry logError:@"exception" message:message exception:exc];
 #endif		
