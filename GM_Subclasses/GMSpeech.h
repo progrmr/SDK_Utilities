@@ -37,6 +37,9 @@
 // if it was a duplicate of the last speech (within dropDuplicatesTime)
 - (void)speakString:(NSString*)string withCompletion:(void (^)(BOOL finished))completion;
 
+// pauseFor inserts a pause into the speech queue
+- (void)pauseFor:(NSTimeInterval)pauseSeconds;
+
 // removes unspoken strings from the queue, returns YES if something was dequeued
 - (BOOL)flushQueue;
 

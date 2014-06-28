@@ -36,6 +36,7 @@
 // GMSpeechEntry is a object that holds text to be spoken and a completion block
 @interface GMSpeechEntry : NSObject
 @property (nonatomic, copy)   NSString* string;
+@property (nonatomic, assign) NSTimeInterval pause;     // pause duration (string will be nil)
 @property (nonatomic, strong) void (^completion)(BOOL finished);
 @end
 
@@ -113,16 +114,14 @@
 #pragma mark -
 #pragma mark queues a string for speaking
 - (void)speakString:(NSString*)string
-{
-    [self speakString:string withCompletion:nil];
-}
-
-- (void)speakString:(NSString*)string withCompletion:(void (^)(BOOL finished))completion
+            orPause:(NSTimeInterval)pauseInterval
+     withCompletion:(void (^)(BOOL finished))completion
 {
     if (string.length > 0) {
         // add this string to the queue
         GMSpeechEntry* qEntry = [[GMSpeechEntry alloc] init];
         qEntry.string     = string;
+        qEntry.pause      = pauseInterval;
         qEntry.completion = completion;
 
         @synchronized (self.speechQueue) {
@@ -138,6 +137,22 @@
             completion(NO); // no because string was 0 length
         }
     }
+}
+
+- (void)speakString:(NSString*)string
+{
+    [self speakString:string orPause:0 withCompletion:nil];
+}
+
+- (void)speakString:(NSString*)string withCompletion:(void (^)(BOOL))completion
+{
+    [self speakString:string orPause:0 withCompletion:completion];
+}
+
+// pauseFor: inserts a pause into the speech queue
+- (void)pauseFor:(NSTimeInterval)pauseInterval
+{
+    [self speakString:nil orPause:pauseInterval withCompletion:nil];
 }
 
 - (void)speakNext
@@ -169,26 +184,52 @@
         return;
     }
 
-    // speak it now
-    DLog(@"SPEAK: \"%@\"", nextEntry.string);
+    if (nextEntry.string.length) {
+        // speak it now
+        DLog(@"SPEAK: \"%@\"", nextEntry.string);
+    } else {
+        // pause now
+        DLog(@"PAUSE: %0.3f seconds", nextEntry.pause);
+    }
 
     // starting to speak this entry
     @synchronized(self.currentSpeech) {
         self.currentSpeech = nextEntry;
     }
 
+    if (nextEntry.string.length) {
 #if TARGET_OS_IPHONE
-    // on iOS we must convert the text to an utterance
-    AVSpeechUtterance* utterance = [AVSpeechUtterance speechUtteranceWithString:nextEntry.string];
-    utterance.voice = self.voice;
-    utterance.rate  = 0.25f;      // range 0.0f - 1.0f
-    [self.speech speakUtterance:utterance];
-
+        // on iOS we must convert the text to an utterance
+        AVSpeechUtterance* utterance = [AVSpeechUtterance speechUtteranceWithString:nextEntry.string];
+        utterance.voice = self.voice;
+        utterance.rate  = 0.25f;      // range 0.0f - 1.0f
+        [self.speech speakUtterance:utterance];
+        
 #else   /* MAC OSX */
-    [self.speech startSpeakingString:nextEntry.string];
+        [self.speech startSpeakingString:nextEntry.string];
 #endif  /* TARGET_OS_IPHONE */
+        
+    } else {
+        // pause for a moment
+        [self performSelector:@selector(didCompletePauseEntry:)
+                   withObject:nextEntry
+                   afterDelay:nextEntry.pause];
+    }
 }
 
+- (void)didCompletePauseEntry:(GMSpeechEntry*)pauseEntry
+{
+    @synchronized(self.currentSpeech) {
+        self.currentSpeech = nil;       // clear currentSpeech (completion block may set it)
+        
+        if (pauseEntry.completion) {
+            pauseEntry.completion(YES);     // pause is finished
+        }
+    }
+    
+    // speak next phrase in the queue after a slight pause
+    [self performSelector:@selector(speakNext) withObject:nil afterDelay:0.25];
+}
 
 // removes unspoken strings from the queue
 - (BOOL)flushQueue
