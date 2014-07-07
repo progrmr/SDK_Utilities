@@ -59,9 +59,14 @@
     
         NSLog(@"saved %d to %@", [stateData count], fullPathname);
 #ifdef DEBUG
-        NSLog(@"%@", stateData);
+///        NSLog(@"%@", stateData);
 #endif
     }
+}
+
+- (void)synchronize
+{
+    [self saveDataToFile:nil];
 }
 
 //----------------------------------------------------------------
@@ -165,10 +170,10 @@
     }
 }
 
--(void)setObjectForKey:(NSString*)key object:(id)object
+- (void)setObject:(id)value forKey:(NSString *)key
 {
     @synchronized(self) {
-        [self.stateData setValue:object forKey:key];
+        [self.stateData setValue:value forKey:key];
         ///NSLog(@"setObjectForKey: %@ %@", key, [object class]);
     }
 }

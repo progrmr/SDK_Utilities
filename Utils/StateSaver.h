@@ -41,6 +41,8 @@
 //----------------------------------------------------------------
 -(void)saveDataToFile:(NSNotification*)notification;
 
+- (void)synchronize;
+
 //----------------------------------------------------------------
 // Count of items in dictionary, if count is 0 after init then
 // file was not read in and you should set your default values.
@@ -52,7 +54,8 @@
 //---------------------------------------------------------------------
 -(void)setFloatForKey:(NSString*)key  value:(float)value;
 -(void)setIntForKey:(NSString*)key    value:(int)value;
--(void)setObjectForKey:(NSString*)key object:(id)object;  // removes if nil
+
+- (void)setObject:(id)value forKey:(NSString *)key;
 
 //---------------------------------------------------------------------
 // return values out of the dictionary
