@@ -31,7 +31,7 @@
     if ([[NSFileManager defaultManager] fileExistsAtPath:fullPathname]) { 
         // Read the last updated date and points values from the plist file
         tmp = [[NSMutableDictionary alloc] initWithContentsOfFile:fullPathname];
-        NSLog(@"%s read %d from %@", __PRETTY_FUNCTION__, [tmp count], fullPathname);
+        NSLog(@"%s read %lu from %@", __PRETTY_FUNCTION__, (unsigned long)[tmp count], fullPathname);
         ///NSLog(@"%@", tmp);
         
     } else {
@@ -57,7 +57,7 @@
             [stateData writeToFile:fullPathname atomically:YES];
         }
     
-        NSLog(@"saved %d to %@", [stateData count], fullPathname);
+        NSLog(@"saved %lu to %@", (unsigned long)[stateData count], fullPathname);
 #ifdef DEBUG
 ///        NSLog(@"%@", stateData);
 #endif
