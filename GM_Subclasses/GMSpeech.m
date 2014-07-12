@@ -53,6 +53,7 @@
 @property (nonatomic, strong) NSString*                 lastSpoken;     // last spoken string
 @property (nonatomic, assign) CFAbsoluteTime            lastSpokenTime; // time lastSpoken was spoken
 @property (nonatomic, strong) GMSpeechEntry*            currentSpeech;  // currently being spoken
+@property (nonatomic, assign) BOOL                      speaking;
 
 #if TARGET_OS_IPHONE
 @property (nonatomic, strong) AVSpeechSynthesisVoice*   voice;          // used with iOS
@@ -109,6 +110,41 @@
         _speech.delegate = self;
     }
     return _speech;
+}
+
+- (void)setCurrentSpeech:(GMSpeechEntry *)currentSpeech
+{
+    const BOOL wasSpeaking = _currentSpeech != nil;
+    const BOOL willSpeak   = currentSpeech != nil;
+    
+    _currentSpeech = currentSpeech;
+    
+    if (wasSpeaking != willSpeak) {
+        if (willSpeak) {
+            self.speaking = YES;
+        } else {
+            if (self.speechQueue.count == 0) {
+                self.speaking = NO;
+            }
+        }
+    }
+}
+
+- (void)setSpeaking:(BOOL)speaking
+{
+    const BOOL changed = _speaking != speaking;
+    
+    if (changed) {
+        _speaking = speaking;
+        
+        if (speaking) {
+            DLog(@"-----STARTED-----");
+            [self.delegate speechStarted];
+        } else {
+            DLog(@"=====FINISHED=====");
+            [self.delegate speechFinished];
+        }
+    }
 }
 
 #pragma mark -
@@ -243,13 +279,14 @@
             [self.speech stopSpeakingAtBoundary:AVSpeechBoundaryWord];
 
             GMSpeechEntry* entry = self.currentSpeech;
-            self.currentSpeech = nil;
             wasSpeaking = YES;
             DLog(@"aborted: \"%@\"", entry.string);
 
             if (entry.completion) {
                 entry.completion(NO);
             }
+            
+            self.currentSpeech = nil;
         }
     }
 
@@ -291,11 +328,12 @@
         self.lastSpokenTime = CFAbsoluteTimeGetCurrent();
         
         GMSpeechEntry* current = self.currentSpeech;
-        self.currentSpeech = nil;       // clear currentSpeech (completion block may set it)
 
         if (current.completion) {
             current.completion(finishedSpeaking);     // speech finished
         }
+
+        self.currentSpeech = nil;       // clear currentSpeech (completion block may set it)
     }
 
     // speak next phrase in the queue after a slight pause

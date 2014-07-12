@@ -21,12 +21,23 @@
 
 #import <Foundation/Foundation.h>
 
+@protocol GMSpeechDelegate
+
+- (void)speechStarted;
+- (void)speechFinished;
+
+@end
+
+
 @interface GMSpeech : NSObject
 
 // if the same string is sent to speakString again within dropDuplicatesTime,
 // then the string will not be spoken (it only checks against one previous),
 // default is 20 seconds
 @property (nonatomic, assign) NSTimeInterval dropDuplicatesTime;
+
+@property (nonatomic, weak) id<GMSpeechDelegate> delegate;
+@property (nonatomic, readonly, getter = isSpeaking) BOOL speaking;
 
 + (GMSpeech*)speaker;               // returns singleton instance
 
