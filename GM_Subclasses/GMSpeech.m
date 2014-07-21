@@ -138,10 +138,10 @@
         _speaking = speaking;
         
         if (speaking) {
-            DLog(@"-----STARTED-----");
+            ///DLog(@"-----STARTED-----");
             [self.delegate speechStarted];
         } else {
-            DLog(@"=====FINISHED=====");
+            ///DLog(@"=====FINISHED=====");
             [self.delegate speechFinished];
         }
     }
