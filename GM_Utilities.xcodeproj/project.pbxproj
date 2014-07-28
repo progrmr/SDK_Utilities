@@ -44,6 +44,7 @@
 		2CF3F99917E76EA600462895 /* GMPageControl.m in Sources */ = {isa = PBXBuildFile; fileRef = 2CF3F99017E76EA600462895 /* GMPageControl.m */; };
 		2CF3F99A17E76EA600462895 /* GMProgressHUD.m in Sources */ = {isa = PBXBuildFile; fileRef = 2CF3F99217E76EA600462895 /* GMProgressHUD.m */; };
 		2CF3F99B17E76EA600462895 /* SampleSingleton.m in Sources */ = {isa = PBXBuildFile; fileRef = 2CF3F99517E76EA600462895 /* SampleSingleton.m */; };
+		8E1AF7A91985E27600ED5D17 /* GAMLabel.m in Sources */ = {isa = PBXBuildFile; fileRef = 8E1AF7A81985E27600ED5D17 /* GAMLabel.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -142,6 +143,8 @@
 		2CF3F99317E76EA600462895 /* README */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = README; sourceTree = SOURCE_ROOT; };
 		2CF3F99417E76EA600462895 /* SampleSingleton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SampleSingleton.h; sourceTree = SOURCE_ROOT; };
 		2CF3F99517E76EA600462895 /* SampleSingleton.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SampleSingleton.m; sourceTree = SOURCE_ROOT; };
+		8E1AF7A71985E27600ED5D17 /* GAMLabel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GAMLabel.h; sourceTree = "<group>"; };
+		8E1AF7A81985E27600ED5D17 /* GAMLabel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GAMLabel.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -220,6 +223,8 @@
 				2CF3F93417E76E4300462895 /* GMSpeech.m */,
 				2CF3F93517E76E4300462895 /* GMTableView.h */,
 				2CF3F93617E76E4300462895 /* GMTableView.m */,
+				8E1AF7A71985E27600ED5D17 /* GAMLabel.h */,
+				8E1AF7A81985E27600ED5D17 /* GAMLabel.m */,
 			);
 			path = GM_Subclasses;
 			sourceTree = "<group>";
@@ -348,6 +353,7 @@
 				2CF3F93917E76E4300462895 /* GMDatePicker.m in Sources */,
 				2CF3F99917E76EA600462895 /* GMPageControl.m in Sources */,
 				2CF3F97D17E76E6600462895 /* Animations.m in Sources */,
+				8E1AF7A91985E27600ED5D17 /* GAMLabel.m in Sources */,
 				2CF3F98117E76E6600462895 /* RemoteFile.m in Sources */,
 				2CF3F93E17E76E4300462895 /* GMSpeech.m in Sources */,
 				2CF3F93717E76E4300462895 /* GMButton.m in Sources */,
