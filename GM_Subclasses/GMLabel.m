@@ -43,7 +43,7 @@
     if ((self = (id)label)) {
         // initialize
         label.frame = newFrame;
-        label.textAlignment = UITextAlignmentCenter;
+        label.textAlignment = NSTextAlignmentCenter;
         
         [self awakeFromNib];
     }
@@ -65,7 +65,7 @@
 	CGFloat cRadius = bounds.size.height * 0.20f;	// 20% height is good
 	
 	self.autoresizesSubviews = YES;
-    self.minimumFontSize     = 10;
+    self.minimumScaleFactor  = 0.60f;
     self.adjustsFontSizeToFitWidth = YES;
     
 	self.layer.masksToBounds = YES;

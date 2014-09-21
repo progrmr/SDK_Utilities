@@ -147,7 +147,7 @@
 {
 	// Get the size of the keyboard.
     NSDictionary* info  = [aNotification userInfo];
-    NSValue* aValue     = [info objectForKey:UIKeyboardBoundsUserInfoKey];
+    NSValue* aValue     = [info objectForKey:UIKeyboardFrameEndUserInfoKey];
     CGSize keyboardSize = [aValue CGRectValue].size;
 	keyboardHeight = keyboardSize.height;
 	
@@ -174,7 +174,7 @@
 {
 	// Get the size of the keyboard.
     NSDictionary* info  = [aNotification userInfo];
-    NSValue* aValue     = [info objectForKey:UIKeyboardBoundsUserInfoKey];
+    NSValue* aValue     = [info objectForKey:UIKeyboardFrameBeginUserInfoKey];
     CGSize keyboardSize = [aValue CGRectValue].size;
 	
 	///NSLog(@"keybdWillHide=(%1.0f,%1.0f) %@", keyboardSize.width, keyboardSize.height, self);

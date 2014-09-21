@@ -310,14 +310,14 @@ static NSMutableDictionary *colorNameCache = nil;
 	NSScanner *scanner = [NSScanner scannerWithString:stringToConvert];
 	if (![scanner scanString:@"{" intoString:NULL]) return nil;
 	const NSUInteger kMaxComponents = 4;
-	CGFloat c[kMaxComponents];
+    float colorComponents[kMaxComponents];
 	NSUInteger i = 0;
-	if (![scanner scanFloat:&c[i++]]) return nil;
+	if (![scanner scanFloat:&colorComponents[i++]]) return nil;
 	while (1) {
 		if ([scanner scanString:@"}" intoString:NULL]) break;
 		if (i >= kMaxComponents) return nil;
 		if ([scanner scanString:@"," intoString:NULL]) {
-			if (![scanner scanFloat:&c[i++]]) return nil;
+			if (![scanner scanFloat:&colorComponents[i++]]) return nil;
 		} else {
 			// either we're at the end of there's an unexpected character here
 			// both cases are error conditions
@@ -328,10 +328,13 @@ static NSMutableDictionary *colorNameCache = nil;
 	UIColor *color;
 	switch (i) {
 		case 2: // monochrome
-			color = [UIColor colorWithWhite:c[0] alpha:c[1]];
+			color = [UIColor colorWithWhite:colorComponents[0] alpha:colorComponents[1]];
 			break;
 		case 4: // RGB
-			color = [UIColor colorWithRed:c[0] green:c[1] blue:c[2] alpha:c[3]];
+			color = [UIColor colorWithRed:colorComponents[0]
+                                    green:colorComponents[1]
+                                     blue:colorComponents[2]
+                                    alpha:colorComponents[3]];
 			break;
 		default:
 			color = nil;

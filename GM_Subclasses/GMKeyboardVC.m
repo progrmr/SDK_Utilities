@@ -35,7 +35,7 @@
 	
     // Get the size of the keyboard.
     NSDictionary* info  = [aNotification userInfo];
-    NSValue* aValue     = [info objectForKey:UIKeyboardBoundsUserInfoKey];
+    NSValue* aValue     = [info objectForKey:UIKeyboardFrameEndUserInfoKey];
     CGSize keyboardSize = [aValue CGRectValue].size;
 
     // Get the animation duration

@@ -101,7 +101,7 @@
         msgLabel.backgroundColor = [UIColor clearColor];
         msgLabel.textColor       = [UIColor whiteColor];
         msgLabel.font            = [UIFont systemFontOfSize:14];
-        msgLabel.textAlignment   = UITextAlignmentCenter;
+        msgLabel.textAlignment   = NSTextAlignmentCenter;
         msgLabel.clipsToBounds   = NO;
         [self addSubview:msgLabel];
 
