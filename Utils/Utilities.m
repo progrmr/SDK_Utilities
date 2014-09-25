@@ -478,13 +478,13 @@ BOOL isFileInDocuments(NSURL* fileURL)
 }
 
 //----------------------------------------------------------------------
-// logs the event to the FlurryAnalytics.h 
+// logs the event to the Flurry.h 
 // (or to NSLog if in development)
 //----------------------------------------------------------------------
 void logEvent(NSString* description) 
 {
 #if defined(FLURRYAPI) && !(TARGET_IPHONE_SIMULATOR)
-	// count/log events using the FlurryAnalytics.h
+	// count/log events using the Flurry.h
 	[Flurry logEvent:description];
 #else
 	NSLog(@"logEvent: %@", description);
@@ -501,7 +501,7 @@ void logError(NSString* error, NSString* format, ...)
     va_end (args);
     
 #if defined(FLURRYAPI) && !(TARGET_IPHONE_SIMULATOR)
-	// count/log events using the FlurryAnalytics.h
+	// count/log events using the Flurry.h
 	[Flurry logError:error message:message exception:NULL];
 #endif		
 	NSLog(@"ERROR: %@ %@", error, message);
@@ -519,7 +519,7 @@ void logException(NSException* exc, NSString* format, ...)
     va_end (args);
     
 #if defined(FLURRYAPI) && !(TARGET_IPHONE_SIMULATOR)
-	// count/log events using the FlurryAnalytics.h
+	// count/log events using the Flurry.h
 	[Flurry logError:@"exception" message:message exception:exc];
 #endif		
 	NSLog(@"ERROR: %@, %@, %@", exc.name, exc.reason, message);
@@ -589,7 +589,7 @@ void GMLog(NSString *format, ...)
     if (minReqdVersion==nil) return YES;        // no requirement
     
     NSDictionary* infoDict = [[NSBundle mainBundle] infoDictionary];
-    NSString* runningVersion = [infoDict objectForKey:@"CFBundleVersion"];
+    NSString* runningVersion = [infoDict objectForKey:@"CFBundleShortVersionString"];
 
     NSArray* minReqdArray = [minReqdVersion componentsSeparatedByString:@"."];
     NSArray* runningArray = [runningVersion componentsSeparatedByString:@"."];
