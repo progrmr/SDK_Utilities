@@ -57,6 +57,7 @@
 
 #if TARGET_OS_IPHONE
 @property (nonatomic, strong) AVSpeechSynthesisVoice*   voice;          // used with iOS
+@property (nonatomic, assign) float                     utteranceRate;
 #endif
 
 @end
@@ -82,6 +83,10 @@
     if (self) {
         _speechQueue = [NSMutableArray arrayWithCapacity:8];
         _dropDuplicatesTime = 20;
+        
+        const BOOL isIOS8 = [UIAlertController class] != nil;
+        
+        _utteranceRate = isIOS8 ? 0.15f : 0.25f;    // rate meaning changed for iOS8
     }
     return self;
 }
@@ -238,7 +243,7 @@
         // on iOS we must convert the text to an utterance
         AVSpeechUtterance* utterance = [AVSpeechUtterance speechUtteranceWithString:nextEntry.string];
         utterance.voice = self.voice;
-        utterance.rate  = 0.25f;      // range 0.0f - 1.0f
+        utterance.rate  = self.utteranceRate;      // range 0.0f - 1.0f
         [self.speech speakUtterance:utterance];
         
 #else   /* MAC OSX */
