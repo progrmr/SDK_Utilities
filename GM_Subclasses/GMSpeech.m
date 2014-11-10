@@ -86,7 +86,7 @@
         
         const BOOL isIOS8 = [UIAlertController class] != nil;
         
-        _utteranceRate = isIOS8 ? 0.15f : 0.25f;    // rate meaning changed for iOS8
+        _utteranceRate = isIOS8 ? 0.12f : 0.25f;    // rate meaning changed for iOS8
     }
     return self;
 }
