@@ -11,4 +11,9 @@
 
 @interface AVCaptureDevice (Additions)
 
+// starts flashes the torch (LED) the number of flashes specified
+// (flashing is done asynchronously)
+//
++ (void)flashTorch:(unsigned)flashCount;
+
 @end
