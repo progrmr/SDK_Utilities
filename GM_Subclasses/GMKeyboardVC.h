@@ -20,6 +20,7 @@
 //
 
 #import <Foundation/Foundation.h>
+#import <UIKit/UIKit.h> 
 
 // This UIViewController subclass handles keyboard notifications and 
 // moves the view so that the field being edited is not obscured by

@@ -44,16 +44,15 @@
     
 }
 
-+(id)buttonWithFrame:(CGRect)newFrame
++(instancetype)buttonWithFrame:(CGRect)newFrame
 {
     GMButtonPeaked* button = [super buttonWithType:UIButtonTypeCustom];
-    
-    if ((self = (id)button)) {
-        // initialize
-        button.frame = newFrame;
-        button.peakHeight = 0;
-    }
-    return self;
+
+    // initialize
+    button.frame = newFrame;
+    button.peakHeight = 0;
+
+    return button;
 }
 
 -(void)addRectWithPeaks:(CGContextRef)ctx 

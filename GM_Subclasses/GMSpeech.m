@@ -21,6 +21,8 @@
 // along with this file. If not, see <http://www.gnu.org/licenses/>.
 //
 #import "GMSpeech.h"
+#import <UIKit/UIKit.h> 
+#import "Utilities.h"
 
 #if TARGET_OS_IPHONE
 #import <AVFoundation/AVFoundation.h>

@@ -25,7 +25,6 @@
 #import <QuartzCore/QuartzCore.h>
 #import "Utilities.h"
 #import "UtilitiesUI.h"
-#import "AppDelegate_iPhone.h"
 
 @implementation GMProgressHUD
 
@@ -127,7 +126,7 @@
 -(void)show
 {
     // add view centered in the window (but up a little from center)
-    UIWindow* window = [[AppDelegate_iPhone instance] window];
+    UIWindow* window = [UIApplication sharedApplication].keyWindow;
     CGRect wBounds = window.bounds;
     self.center = CGPointMake(CGRectGetMidX(wBounds), CGRectGetMidY(wBounds) * 0.7f);
     [window addSubview:self];

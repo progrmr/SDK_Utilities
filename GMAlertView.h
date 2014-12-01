@@ -20,6 +20,7 @@
 //
 
 #import <Foundation/Foundation.h>
+#import <UIKit/UIKit.h>
 
 // this variant of UIAlertView automatically dismisses itself when the
 // app goes into the background on a multitasking system

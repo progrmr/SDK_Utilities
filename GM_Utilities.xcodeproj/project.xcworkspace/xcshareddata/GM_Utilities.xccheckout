@@ -10,29 +10,29 @@
 	<string>GM_Utilities</string>
 	<key>IDESourceControlProjectOriginsDictionary</key>
 	<dict>
-		<key>37F813D5-49C0-4AA7-9437-D590A5F7474E</key>
+		<key>37FBB7F4119C700BD59550E54D9649334F05F430</key>
 		<string>https://github.com/progrmr/SDK_Utilities.git</string>
 	</dict>
 	<key>IDESourceControlProjectPath</key>
-	<string>GM_Utilities.xcodeproj/project.xcworkspace</string>
+	<string>GM_Utilities.xcodeproj</string>
 	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
 	<dict>
-		<key>37F813D5-49C0-4AA7-9437-D590A5F7474E</key>
+		<key>37FBB7F4119C700BD59550E54D9649334F05F430</key>
 		<string>../..</string>
 	</dict>
 	<key>IDESourceControlProjectURL</key>
 	<string>https://github.com/progrmr/SDK_Utilities.git</string>
 	<key>IDESourceControlProjectVersion</key>
-	<integer>110</integer>
+	<integer>111</integer>
 	<key>IDESourceControlProjectWCCIdentifier</key>
-	<string>37F813D5-49C0-4AA7-9437-D590A5F7474E</string>
+	<string>37FBB7F4119C700BD59550E54D9649334F05F430</string>
 	<key>IDESourceControlProjectWCConfigurations</key>
 	<array>
 		<dict>
 			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
 			<string>public.vcs.git</string>
 			<key>IDESourceControlWCCIdentifierKey</key>
-			<string>37F813D5-49C0-4AA7-9437-D590A5F7474E</string>
+			<string>37FBB7F4119C700BD59550E54D9649334F05F430</string>
 			<key>IDESourceControlWCCName</key>
 			<string>SDK_Utilities</string>
 		</dict>
